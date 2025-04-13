@@ -10,7 +10,8 @@
  */
 function formatDateDMY($date) {
     if (!$date) return '';
-    return date('d-m-Y', strtotime($date));
+    $timestamp = strtotime($date);
+    return $timestamp ? date('d-m-Y', $timestamp) : '';
 }
 
 /**
@@ -20,6 +21,29 @@ function formatDateDMY($date) {
  */
 function formatDateTimeDMY($date) {
     if (!$date) return '';
-    return date('d-m-Y H:i', strtotime($date));
+    $timestamp = strtotime($date);
+    return $timestamp ? date('d-m-Y H:i', $timestamp) : '';
+}
+
+/**
+ * Convert date from any format to YYYY-MM-DD for database storage
+ * @param string $date The date string to format
+ * @return string Formatted date for database
+ */
+function formatDateForDB($date) {
+    if (!$date) return null;
+    $timestamp = strtotime($date);
+    return $timestamp ? date('Y-m-d', $timestamp) : null;
+}
+
+/**
+ * Validate date format
+ * @param string $date The date string to validate
+ * @return bool True if valid date, false otherwise
+ */
+function isValidDate($date) {
+    if (!$date) return false;
+    $timestamp = strtotime($date);
+    return $timestamp !== false && $timestamp !== -1;
 }
 ?>

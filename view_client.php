@@ -81,7 +81,7 @@ if($stmt = mysqli_prepare($conn, $sql)) {
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 fw-bold">Date of Birth:</div>
-                        <div class="col-sm-8"><?php echo formatDateDMY($client['date_of_birth']); ?></div>
+                        <div class="col-sm-8"><?php echo format_date($client['date_of_birth'], 'd-m-Y'); ?></div>
                     </div>
                     <div class="row">
                         <div class="col-sm-4 fw-bold">Address:</div>
@@ -132,7 +132,7 @@ if($stmt = mysqli_prepare($conn, $sql)) {
                                             ?>
                                         </td>
                                         <td>₹<?php echo number_format($policy['premium'], 2); ?></td>
-                                        <td><?php echo formatDateDMY($policy['start_date']); ?></td>
+                                        <td><?php echo format_date($policy['start_date'], 'd-m-Y'); ?></td>
                                         <td>
                                             <a href="view_policy.php?id=<?php echo $policy['id']; ?>" class="btn btn-sm btn-info" title="View">
                                                 <i class="fas fa-eye"></i>

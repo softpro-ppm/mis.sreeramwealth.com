@@ -45,14 +45,28 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty(trim($_POST["start_date"]))){
         $start_date_err = "Please enter start date.";
     } else{
-        $start_date = date('Y-m-d', strtotime(trim($_POST["start_date"])));
+        $date = trim($_POST["start_date"]);
+        if (!isValidDate($date)) {
+            $start_date_err = "Please enter a valid start date.";
+        } else {
+            $start_date = formatDateForDB($date);
+        }
     }
     
     // Validate end date
     if(empty(trim($_POST["end_date"]))){
         $end_date_err = "Please enter end date.";
     } else{
-        $end_date = date('Y-m-d', strtotime(trim($_POST["end_date"])));
+        $date = trim($_POST["end_date"]);
+        if (!isValidDate($date)) {
+            $end_date_err = "Please enter a valid end date.";
+        } else {
+            $end_date = formatDateForDB($date);
+            // Validate end date is after start date
+            if ($start_date && strtotime($end_date) <= strtotime($start_date)) {
+                $end_date_err = "End date must be after start date.";
+            }
+        }
     }
     
     // Validate premium
@@ -81,14 +95,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')";
             
             if($stmt = mysqli_prepare($conn, $sql)){
-                $param_start_date = date('Y-m-d', strtotime($start_date));
-                $param_end_date = date('Y-m-d', strtotime($end_date));
                 mysqli_stmt_bind_param($stmt, "sisssdd", 
                     $policy_number,
                     $client_id,
                     $type,
-                    $param_start_date,
-                    $param_end_date,
+                    $start_date,
+                    $end_date,
                     $premium,
                     $coverage_amount
                 );

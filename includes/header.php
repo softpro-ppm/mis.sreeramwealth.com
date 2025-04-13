@@ -16,6 +16,49 @@
     
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Date formatting functions -->
+    <script>
+        function formatDateForDisplay(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-GB'); // This will format as DD/MM/YYYY
+        }
+
+        function formatDateForInput(dateStr) {
+            if (!dateStr) return '';
+            const date = new Date(dateStr);
+            return date.toISOString().split('T')[0]; // This will format as YYYY-MM-DD
+        }
+
+        // Initialize date inputs when the document is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            
+            dateInputs.forEach(function(input) {
+                // Create display element
+                const displaySpan = document.createElement('span');
+                displaySpan.className = 'date-display ms-2';
+                input.parentNode.insertBefore(displaySpan, input.nextSibling);
+
+                // Function to update display
+                function updateDisplay() {
+                    if (input.value) {
+                        displaySpan.textContent = '(' + formatDateForDisplay(input.value) + ')';
+                    } else {
+                        displaySpan.textContent = '';
+                    }
+                }
+
+                // Update display on load
+                updateDisplay();
+
+                // Update display when date changes
+                input.addEventListener('change', updateDisplay);
+                input.addEventListener('input', updateDisplay);
+            });
+        });
+    </script>
     
     <style>
     body {
@@ -90,45 +133,5 @@
             </div>
         <?php endif; ?>
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Format date inputs to DD-MM-YYYY
-            const dateInputs = document.querySelectorAll('input[type="date"]');
-            dateInputs.forEach(function(input) {
-                // When displaying a date value
-                if (input.value) {
-                    const date = new Date(input.value);
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const displayValue = `${day}-${month}-${date.getFullYear()}`;
-                    input.dataset.displayValue = displayValue;
-                }
-
-                // Create a span to show formatted date
-                const displaySpan = document.createElement('span');
-                displaySpan.className = 'date-display';
-                displaySpan.style.marginLeft = '10px';
-                input.parentNode.insertBefore(displaySpan, input.nextSibling);
-
-                // Update display when date changes
-                input.addEventListener('change', function() {
-                    if (this.value) {
-                        const date = new Date(this.value);
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const displayValue = `${day}-${month}-${date.getFullYear()}`;
-                        this.dataset.displayValue = displayValue;
-                        displaySpan.textContent = `(${displayValue})`;
-                    } else {
-                        displaySpan.textContent = '';
-                    }
-                });
-
-                // Trigger change event to format existing dates
-                const event = new Event('change');
-                input.dispatchEvent(event);
-            });
-        });
-    </script>
 </body>
 </html>

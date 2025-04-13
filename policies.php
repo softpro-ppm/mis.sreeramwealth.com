@@ -166,8 +166,8 @@ $policies = mysqli_query($conn, $sql);
                                         <div class="form-text">Max file size: 5MB. Allowed types: PDF, DOC, DOCX, JPG, PNG</div>
                                     </div>
                                     <div class="col-md-2 d-flex align-items-end">
-                                        <button type="button" class="btn btn-danger remove-document">
-                                            <i class="fas fa-minus"></i>
+                                        <button type="button" class="btn btn-success add-document">
+                                            <i class="fas fa-plus"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -296,9 +296,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle remove button click
     $(document).on('click', '.remove-document', function() {
-        if ($('.document-row').length > 1) {
-            $(this).closest('.document-row').remove();
-        }
+        $(this).closest('.document-row').remove();
     });
 
     // File size and type validation

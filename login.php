@@ -81,37 +81,120 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <?php include 'includes/header.php'; ?>
 
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-header">
-                <h3 class="text-center">Login</h3> 
-            </div>
-            <div class="card-body">
-                <?php 
-                if(!empty($login_err)){
-                    echo '<div class="alert alert-danger">' . $login_err . '</div>';
-                }        
-                ?>
+<div class="container-fluid">
+    <div class="row min-vh-100 align-items-center justify-content-center">
+        <div class="col-md-4">
+            <div class="card shadow-lg">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <img src="assets/img/logo.png" alt="Logo" class="mb-4" style="max-width: 150px;">
+                        <h3 class="text-primary">Welcome Back</h3>
+                        <p class="text-muted">Please login to your account</p>
+                    </div>
 
-                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                    <div class="form-group mb-3">
-                        <label>Username</label>
-                        <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
-                        <span class="invalid-feedback"><?php echo $username_err; ?></span>
-                    </div>    
-                    <div class="form-group mb-3">
-                        <label>Password</label>
-                        <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
-                        <span class="invalid-feedback"><?php echo $password_err; ?></span>
+                    <?php 
+                    if(!empty($login_err)){
+                        echo '<div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>' . $login_err . '
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                              </div>';
+                    }        
+                    ?>
+
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                        <div class="form-group mb-4">
+                            <label class="form-label">Username</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-user"></i>
+                                </span>
+                                <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>" placeholder="Enter your username">
+                            </div>
+                            <div class="invalid-feedback"><?php echo $username_err; ?></div>
+                        </div>    
+                        <div class="form-group mb-4">
+                            <label class="form-label">Password</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" placeholder="Enter your password">
+                            </div>
+                            <div class="invalid-feedback"><?php echo $password_err; ?></div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">
+                                    Remember me
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group mb-4">
+                            <button type="submit" class="btn btn-primary w-100 py-2">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0">Forgot your password? <a href="#" class="text-primary">Reset it here</a></p>
                     </div>
-                    <div class="form-group mb-3">
-                        <input type="submit" class="btn btn-primary w-100" value="Login">
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>
 </div>
+
+<style>
+body {
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.card-body {
+    background: white;
+}
+
+.input-group-text {
+    background: transparent;
+    border-right: none;
+}
+
+.form-control {
+    border-left: none;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+.form-control:focus + .input-group-text {
+    border-color: #ced4da;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 12px;
+    font-weight: 500;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+</style>
 
 <?php include 'includes/footer.php'; ?> 

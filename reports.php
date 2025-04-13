@@ -145,6 +145,7 @@ try {
 <!-- Add DataTables CSS and JS -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
 <script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
@@ -309,47 +310,33 @@ try {
 
 <script>
 $(document).ready(function() {
-    // Destroy existing DataTable if it exists
-    if ($.fn.DataTable.isDataTable('.datatable')) {
-        $('.datatable').DataTable().destroy();
-    }
-    
-    // Initialize DataTable with improved configuration
+    // Initialize DataTable with export buttons
     var table = $('.datatable').DataTable({
-        dom: '<"row"<"col-sm-6"B><"col-sm-6"f>>' +
-             '<"row"<"col-sm-12"tr>>' +
-             '<"row"<"col-sm-5"i><"col-sm-7"p>>',
+        dom: 'Bfrtip',
         buttons: [
             {
-                extend: 'collection',
-                text: '<i class="fas fa-download"></i> Export',
-                buttons: [
-                    {
-                        extend: 'excel',
-                        text: '<i class="fas fa-file-excel"></i> Excel',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    },
-                    {
-                        extend: 'pdf',
-                        text: '<i class="fas fa-file-pdf"></i> PDF',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    },
-                    {
-                        extend: 'csv',
-                        text: '<i class="fas fa-file-csv"></i> CSV',
-                        exportOptions: {
-                            columns: ':visible'
-                        }
-                    }
-                ]
+                extend: 'excel',
+                className: 'btn btn-success',
+                text: '<i class="fas fa-file-excel"></i> Excel',
+                title: 'Insurance Report - ' + $('select[name="type"] option:selected').text(),
+                exportOptions: {
+                    columns: ':visible'
+                }
+            },
+            {
+                extend: 'pdf',
+                className: 'btn btn-danger',
+                text: '<i class="fas fa-file-pdf"></i> PDF',
+                title: 'Insurance Report - ' + $('select[name="type"] option:selected').text(),
+                exportOptions: {
+                    columns: ':visible'
+                }
             },
             {
                 extend: 'print',
+                className: 'btn btn-primary',
                 text: '<i class="fas fa-print"></i> Print',
+                title: 'Insurance Report - ' + $('select[name="type"] option:selected').text(),
                 exportOptions: {
                     columns: ':visible'
                 }
@@ -376,19 +363,19 @@ $(document).ready(function() {
         }
     });
 
-    // Custom positioning of Buttons
-    $('.dt-buttons').addClass('mb-3');
-    
     // Export Report button handler
     $('#exportReport').click(function() {
-        $('.dt-button-collection').remove(); // Remove any existing collection
-        table.button('.buttons-excel').trigger();
+        table.button('.buttons-excel:first').trigger();
     });
 
     // Print Report button handler
     $('#printReport').click(function() {
-        table.button('.buttons-print').trigger();
+        table.button('.buttons-print:first').trigger();
     });
+
+    // Style the DataTables buttons
+    $('.dt-buttons').addClass('mb-3');
+    $('.dt-buttons .dt-button').addClass('btn btn-sm mx-1');
 });
 </script>
 
@@ -429,47 +416,51 @@ $(document).ready(function() {
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background: #0d6efd;
-    border-color: #0d6efd;
+    background: #0d6efd !important;
+    border-color: #0d6efd !important;
     color: white !important;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background: #e9ecef;
-    border-color: #dee2e6;
+    background: #e9ecef !important;
+    border-color: #dee2e6 !important;
     color: #0d6efd !important;
 }
 
-.dt-buttons .btn {
-    margin-right: 0.5rem;
+.dt-buttons {
+    margin-bottom: 1rem;
+}
+
+.dt-button {
+    background-color: #fff !important;
+    border: 1px solid #dee2e6 !important;
+    border-radius: 4px !important;
+    color: #333 !important;
+    padding: 0.375rem 0.75rem !important;
+    margin-right: 0.5rem !important;
+}
+
+.dt-button:hover {
+    background-color: #e9ecef !important;
+    color: #0d6efd !important;
+}
+
+.buttons-excel {
+    background-color: #198754 !important;
+    color: white !important;
+}
+
+.buttons-pdf {
+    background-color: #dc3545 !important;
+    color: white !important;
+}
+
+.buttons-print {
+    background-color: #0d6efd !important;
+    color: white !important;
 }
 
 .table.datatable {
     margin-top: 1rem !important;
-}
-
-.dataTables_wrapper .dt-buttons {
-    margin-bottom: 1rem;
-}
-
-.dt-button-collection {
-    padding: 0.5rem;
-    border-radius: 4px;
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
-.dt-button-collection .dt-button {
-    display: block;
-    width: 100%;
-    padding: 0.375rem 0.75rem;
-    margin-bottom: 0.25rem;
-    text-align: left;
-    border: none;
-    background: none;
-}
-
-.dt-button-collection .dt-button:hover {
-    background-color: #e9ecef;
-    color: #0d6efd;
 }
 </style> 

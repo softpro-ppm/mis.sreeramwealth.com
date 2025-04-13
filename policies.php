@@ -178,12 +178,12 @@ $policies = mysqli_query($conn, $sql);
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Start Date</label>
-                            <input type="text" class="form-control" name="start_date" 
+                            <input type="text" id="start_date" class="form-control datepicker" name="start_date" 
                                    placeholder="DD-MM-YYYY" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">End Date</label>
-                            <input type="text" class="form-control" name="end_date" 
+                            <input type="text" id="end_date" class="form-control datepicker" name="end_date" 
                                    placeholder="DD-MM-YYYY" required>
                         </div>
                     </div>
@@ -263,8 +263,59 @@ $policies = mysqli_query($conn, $sql);
 <!-- Add this right before the closing </body> tag, after including footer.php -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Flatpickr for start date
+    const startDatePicker = flatpickr("#start_date", {
+        dateFormat: "d-m-Y",
+        allowInput: true,
+        minDate: 'today',
+        parseDate: (datestr, format) => {
+            // Parse DD-MM-YYYY format
+            if (datestr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                const [day, month, year] = datestr.split("-");
+                return new Date(year, month - 1, day);
+            }
+            return null;
+        },
+        formatDate: (date, format) => {
+            // Format as DD-MM-YYYY
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        },
+        onChange: function(selectedDates, dateStr) {
+            // Update end date min date when start date changes
+            if (selectedDates[0]) {
+                endDatePicker.set('minDate', selectedDates[0]);
+            }
+        }
+    });
+
+    // Initialize Flatpickr for end date
+    const endDatePicker = flatpickr("#end_date", {
+        dateFormat: "d-m-Y",
+        allowInput: true,
+        minDate: 'today',
+        parseDate: (datestr, format) => {
+            // Parse DD-MM-YYYY format
+            if (datestr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                const [day, month, year] = datestr.split("-");
+                return new Date(year, month - 1, day);
+            }
+            return null;
+        },
+        formatDate: (date, format) => {
+            // Format as DD-MM-YYYY
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+    });
+
     // Initialize form validation
     $("#policyForm").validate({
         rules: {
@@ -350,15 +401,49 @@ $(document).ready(function() {
         return parseDate(value) > parseDate(startDate);
     });
 
-    // Delete confirmation
-    $('.delete-btn').on('click', function(e) {
-        if(!confirm('Are you sure you want to delete this policy?')) {
+    // Form validation on submit
+    const form = document.querySelector('#policyForm');
+    form.addEventListener('submit', function(e) {
+        const startDate = document.getElementById('start_date');
+        const endDate = document.getElementById('end_date');
+        
+        // Validate date formats
+        const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+        let isValid = true;
+
+        if (!dateRegex.test(startDate.value)) {
             e.preventDefault();
+            startDate.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (!dateRegex.test(endDate.value)) {
+            e.preventDefault();
+            endDate.classList.add('is-invalid');
+            isValid = false;
+        }
+
+        if (!isValid) {
+            return;
+        }
+
+        // Validate end date is after start date
+        const start = new Date(startDate.value.split('-').reverse().join('-'));
+        const end = new Date(endDate.value.split('-').reverse().join('-'));
+        
+        if (end <= start) {
+            e.preventDefault();
+            endDate.classList.add('is-invalid');
+            const feedback = endDate.nextElementSibling || document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            feedback.textContent = 'End date must be after start date';
+            if (!endDate.nextElementSibling) {
+                endDate.parentNode.appendChild(feedback);
+            }
         }
     });
 });
 </script>
-
 <style>
 .document-upload-container {
     background-color: #f8f9fa;
@@ -430,4 +515,4 @@ input[type="file"] {
 }
 </style>
 
-<?php include 'includes/footer.php'; ?> 
+<?php include 'includes/footer.php'; ?>

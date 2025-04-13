@@ -35,7 +35,7 @@ if($stmt = mysqli_prepare($conn, $sql)) {
 }
 
 // Get client's policies
-$sql = "SELECT * FROM policies WHERE client_id = ? ORDER BY created_at DESC";
+$sql = "SELECT policy_number, type, premium, start_date, id FROM policies WHERE client_id = ? ORDER BY created_at DESC";
 if($stmt = mysqli_prepare($conn, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $client_id);
     mysqli_stmt_execute($stmt);
@@ -113,8 +113,25 @@ if($stmt = mysqli_prepare($conn, $sql)) {
                                     <?php while($policy = mysqli_fetch_assoc($policies)): ?>
                                     <tr>
                                         <td><?php echo htmlspecialchars($policy['policy_number']); ?></td>
-                                        <td><?php echo htmlspecialchars($policy['policy_type']); ?></td>
-                                        <td><?php echo number_format($policy['premium'], 2); ?></td>
+                                        <td>
+                                            <?php 
+                                            $type = htmlspecialchars($policy['type']);
+                                            $typeClass = '';
+                                            switch(strtolower($type)) {
+                                                case 'health':
+                                                    $typeClass = 'text-success';
+                                                    break;
+                                                case 'life':
+                                                    $typeClass = 'text-primary';
+                                                    break;
+                                                case 'general':
+                                                    $typeClass = 'text-info';
+                                                    break;
+                                            }
+                                            echo '<span class="' . $typeClass . ' fw-bold text-capitalize">' . $type . '</span>';
+                                            ?>
+                                        </td>
+                                        <td>₹<?php echo number_format($policy['premium'], 2); ?></td>
                                         <td><?php echo date('d M Y', strtotime($policy['start_date'])); ?></td>
                                         <td>
                                             <a href="view_policy.php?id=<?php echo $policy['id']; ?>" class="btn btn-sm btn-info" title="View">

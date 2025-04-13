@@ -82,6 +82,12 @@ if (!$documents) {
     die("Error getting documents result: " . mysqli_error($conn));
 }
 
+// Create uploads directory if it doesn't exist
+$upload_dir = "uploads/policy_documents/";
+if (!file_exists($upload_dir)) {
+    mkdir($upload_dir, 0777, true);
+}
+
 // Debug database connection
 echo "<!-- Debug: Database Connected = " . ($conn ? "Yes" : "No") . " -->";
 
@@ -167,14 +173,21 @@ include 'includes/header.php';
                                         <td><?php echo $doc['file_name']; ?></td>
                                         <td><?php echo date('d M Y H:i', strtotime($doc['created_at'])); ?></td>
                                         <td>
-                                            <a href="uploads/policy_documents/<?php echo urlencode($doc['file_name']); ?>" 
+                                            <?php 
+                                            $file_path = $upload_dir . $doc['file_name'];
+                                            if(file_exists($file_path)): 
+                                            ?>
+                                            <a href="<?php echo $file_path; ?>" 
                                                class="btn btn-sm btn-info" target="_blank" title="View">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="uploads/policy_documents/<?php echo urlencode($doc['file_name']); ?>" 
+                                            <a href="<?php echo $file_path; ?>" 
                                                class="btn btn-sm btn-success" download title="Download">
                                                 <i class="fas fa-download"></i>
                                             </a>
+                                            <?php else: ?>
+                                            <span class="text-danger">File not found</span>
+                                            <?php endif; ?>
                                         </td>
                                     </tr>
                                     <?php endwhile; ?>

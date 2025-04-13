@@ -102,6 +102,10 @@ function safeUcfirst($str) {
 function safeHtmlspecialchars($str) {
     return !is_null($str) ? htmlspecialchars($str, ENT_QUOTES, 'UTF-8') : '';
 }
+
+function formatDate($date) {
+    return date('d-m-Y', strtotime($date));
+}
 ?>
 
 <div class="container-fluid px-4">
@@ -137,8 +141,8 @@ function safeHtmlspecialchars($str) {
                                     <?php echo safeUcfirst(safeHtmlspecialchars($policy['status'])); ?>
                                 </span>
                             </p>
-                            <p><strong>Start Date:</strong><br> <?php echo date('d M Y', strtotime($policy['start_date'])); ?></p>
-                            <p><strong>End Date:</strong><br> <?php echo date('d M Y', strtotime($policy['end_date'])); ?></p>
+                            <p><strong>Start Date:</strong><br> <?php echo formatDate($policy['start_date']); ?></p>
+                            <p><strong>End Date:</strong><br> <?php echo formatDate($policy['end_date']); ?></p>
                         </div>
                         <div class="col-md-6">
                             <p><strong>Coverage Amount:</strong><br> ₹<?php echo number_format((float)$policy['coverage_amount']); ?></p>
@@ -180,7 +184,7 @@ function safeHtmlspecialchars($str) {
                                     <tr>
                                         <td><?php echo ucwords(str_replace('_', ' ', safeHtmlspecialchars($doc['document_type']))); ?></td>
                                         <td><?php echo safeHtmlspecialchars($doc['file_name']); ?></td>
-                                        <td><?php echo date('d M Y H:i', strtotime($doc['created_at'])); ?></td>
+                                        <td><?php echo formatDate($doc['created_at']); ?></td>
                                         <td>
                                             <?php 
                                             $file_path = $upload_dir . $doc['file_path'];

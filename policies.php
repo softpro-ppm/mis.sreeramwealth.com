@@ -264,27 +264,58 @@ $(document).ready(function() {
     // Handle dynamic document upload fields
     $('.add-document').click(function() {
         var newRow = $('.document-row:first').clone();
+        // Clear previous values
         newRow.find('input[type="file"]').val('');
         newRow.find('select').val('');
         
-        // Add remove button for new rows
-        var removeBtn = $('<button type="button" class="btn btn-danger remove-document mb-0 ms-2"><i class="fas fa-minus"></i></button>');
-        newRow.find('.col-md-2').append(removeBtn);
+        // Replace the add button with remove button in the new row
+        var addButton = newRow.find('.add-document');
+        var removeButton = $('<button type="button" class="btn btn-danger remove-document"><i class="fas fa-minus"></i></button>');
+        addButton.replaceWith(removeButton);
         
-        newRow.insertBefore('.document-upload-container .row:last');
+        // Append the new row to the container
+        $('.document-upload-container').append(newRow);
     });
 
     // Handle remove button click
     $(document).on('click', '.remove-document', function() {
-        $(this).closest('.document-row').remove();
+        // Don't remove if it's the last row
+        if ($('.document-row').length > 1) {
+            $(this).closest('.document-row').remove();
+        }
     });
 
-    // File size validation
+    // File size and type validation
     $(document).on('change', 'input[type="file"]', function() {
         var maxSize = 5 * 1024 * 1024; // 5MB
-        if (this.files[0].size > maxSize) {
-            alert('File size exceeds 5MB limit');
-            $(this).val('');
+        var allowedTypes = ['application/pdf', 'application/msword', 
+                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                          'image/jpeg', 'image/png'];
+        
+        if (this.files[0]) {
+            // Check file size
+            if (this.files[0].size > maxSize) {
+                alert('File size exceeds 5MB limit');
+                $(this).val('');
+                return;
+            }
+            
+            // Check file type
+            if (!allowedTypes.includes(this.files[0].type)) {
+                alert('Invalid file type. Please upload PDF, DOC, DOCX, JPG, or PNG files only.');
+                $(this).val('');
+                return;
+            }
+        }
+    });
+
+    // Show selected filename
+    $(document).on('change', 'input[type="file"]', function() {
+        var fileName = $(this).val().split('\\').pop();
+        if (fileName) {
+            $(this).next('.form-text').html('Selected file: ' + fileName);
+        } else {
+            $(this).next('.form-text').html('Max file size: 5MB. Allowed types: PDF, DOC, DOCX, JPG, PNG');
         }
     });
 });
@@ -293,15 +324,20 @@ $(document).ready(function() {
 <style>
 .document-upload-container {
     background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
 }
 
 .document-row {
     padding: 15px;
-    border-bottom: 1px solid #dee2e6;
+    margin-bottom: 15px;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    background-color: white;
 }
 
 .document-row:last-child {
-    border-bottom: none;
+    margin-bottom: 0;
 }
 
 .add-document, .remove-document {
@@ -311,11 +347,48 @@ $(document).ready(function() {
     display: flex;
     align-items: center;
     justify-content: center;
+    border-radius: 4px;
+}
+
+.add-document {
+    background-color: #198754;
+    border-color: #198754;
+}
+
+.remove-document {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.add-document:hover {
+    background-color: #157347;
+    border-color: #157347;
+}
+
+.remove-document:hover {
+    background-color: #bb2d3b;
+    border-color: #bb2d3b;
 }
 
 .form-text {
     font-size: 0.75rem;
     color: #6c757d;
+    margin-top: 0.25rem;
+}
+
+.document-row .col-md-2 {
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-start;
+}
+
+input[type="file"] {
+    padding: 0.375rem;
+    cursor: pointer;
+}
+
+.document-type-select {
+    margin-bottom: 0.5rem;
 }
 </style>
 

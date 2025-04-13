@@ -251,8 +251,8 @@ try {
                                     <td><?php echo htmlspecialchars($row['client_name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['type']); ?></td>
                                     <td>₹<?php echo number_format($row['premium'], 2); ?></td>
-                                    <td><?php echo date('d M Y', strtotime($row['start_date'])); ?></td>
-                                    <td><?php echo date('d M Y', strtotime($row['end_date'])); ?></td>
+                                    <td><?php echo formatDateDMY($row['start_date']); ?></td>
+                                    <td><?php echo formatDateDMY($row['end_date']); ?></td>
                                     <td>
                                         <span class="badge bg-<?php echo $row['status'] == 'active' ? 'success' : 'danger'; ?>">
                                             <?php echo ucfirst($row['status']); ?>
@@ -264,14 +264,14 @@ try {
                                     <td><?php echo htmlspecialchars($row['phone']); ?></td>
                                     <td><?php echo $row['total_policies']; ?></td>
                                     <td>₹<?php echo number_format($row['total_premium'], 2); ?></td>
-                                    <td><?php echo date('d M Y', strtotime($row['created_at'])); ?></td>
+                                    <td><?php echo formatDateDMY($row['created_at']); ?></td>
                                 <?php elseif($report_type == 'policies'): ?>
                                     <td><?php echo htmlspecialchars($row['policy_number']); ?></td>
                                     <td><?php echo htmlspecialchars($row['client_name']); ?></td>
                                     <td><?php echo htmlspecialchars($row['type']); ?></td>
                                     <td>₹<?php echo number_format($row['premium'], 2); ?></td>
-                                    <td><?php echo date('d M Y', strtotime($row['start_date'])); ?></td>
-                                    <td><?php echo date('d M Y', strtotime($row['end_date'])); ?></td>
+                                    <td><?php echo formatDateDMY($row['start_date']); ?></td>
+                                    <td><?php echo formatDateDMY($row['end_date']); ?></td>
                                     <td>
                                         <span class="badge bg-<?php echo $row['status'] == 'active' ? 'success' : 'danger'; ?>">
                                             <?php echo ucfirst($row['status']); ?>
@@ -282,7 +282,7 @@ try {
                                     <td><?php echo htmlspecialchars($row['policy_number']); ?></td>
                                     <td><?php echo htmlspecialchars($row['client_name']); ?></td>
                                     <td>₹<?php echo number_format($row['amount'], 2); ?></td>
-                                    <td><?php echo date('d M Y', strtotime($row['payment_date'])); ?></td>
+                                    <td><?php echo formatDateDMY($row['payment_date']); ?></td>
                                     <td>
                                         <span class="badge bg-<?php echo $row['status'] == 'completed' ? 'success' : 'warning'; ?>">
                                             <?php echo ucfirst($row['status']); ?>
@@ -482,4 +482,4 @@ document.addEventListener('DOMContentLoaded', function() {
 }
 </style>
 
-<?php include 'includes/footer.php'; ?> 
+<?php include 'includes/footer.php'; ?>

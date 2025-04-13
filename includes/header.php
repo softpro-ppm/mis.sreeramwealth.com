@@ -30,6 +30,7 @@
     </style>
 </head>
 <body>
+    <?php require_once 'utils.php'; ?>
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
         <div class="container-fluid">
             <a class="navbar-brand" href="dashboard.php">

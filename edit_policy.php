@@ -271,11 +271,10 @@ include 'includes/header.php';
                                 </div>
                                 <div class="col-md-6">
                                     <label class="form-label">Pre-existing Conditions</label>
-                                    <div class="form-check mt-2">
-                                        <input class="form-check-input" type="checkbox" name="pre_existing_conditions" 
-                                               <?php echo $policy['additional_detail'] ? 'checked' : ''; ?>>
-                                        <label class="form-check-label">Yes</label>
-                                    </div>
+                                    <select class="form-select" name="pre_existing_conditions">
+                                        <option value="0" <?php echo !$policy['additional_detail'] ? 'selected' : ''; ?>>No</option>
+                                        <option value="1" <?php echo $policy['additional_detail'] ? 'selected' : ''; ?>>Yes</option>
+                                    </select>
                                 </div>
                             </div>
                         <?php elseif($policy['type'] == 'life'): ?>
@@ -295,9 +294,9 @@ include 'includes/header.php';
                                 <div class="col-md-6">
                                     <label class="form-label">Insurance Type</label>
                                     <select class="form-select" name="insurance_type" required>
-                                        <option value="home" <?php echo $policy['type_detail'] == 'home' ? 'selected' : ''; ?>>Home</option>
                                         <option value="vehicle" <?php echo $policy['type_detail'] == 'vehicle' ? 'selected' : ''; ?>>Vehicle</option>
-                                        <option value="business" <?php echo $policy['type_detail'] == 'business' ? 'selected' : ''; ?>>Business</option>
+                                        <option value="property" <?php echo $policy['type_detail'] == 'property' ? 'selected' : ''; ?>>Property</option>
+                                        <option value="travel" <?php echo $policy['type_detail'] == 'travel' ? 'selected' : ''; ?>>Travel</option>
                                     </select>
                                 </div>
                                 <div class="col-md-6">

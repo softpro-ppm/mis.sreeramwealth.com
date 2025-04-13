@@ -147,7 +147,8 @@ input.valid, textarea.valid {
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control" name="date_of_birth" required max="<?php echo date('Y-m-d'); ?>">
+                        <input type="text" id="date_of_birth" class="form-control datepicker" name="date_of_birth" 
+                               placeholder="DD-MM-YYYY" required>
                         <small class="text-muted">Format: DD-MM-YYYY</small>
                     </div>
                     <div class="mb-3">

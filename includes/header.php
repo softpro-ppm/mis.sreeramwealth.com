@@ -17,65 +17,119 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
+    <!-- jQuery Validation -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
+
     <!-- Flatpickr for better date input -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Flatpickr for all date inputs
-            const dateInputs = document.querySelectorAll('input[type="date"]');
-            dateInputs.forEach(function(input) {
-                // Create a text input to replace the date input
-                const textInput = document.createElement('input');
-                textInput.type = 'text';
-                textInput.className = input.className;
-                textInput.name = input.name;
-                textInput.id = input.id;
-                textInput.required = input.required;
-                textInput.placeholder = 'DD-MM-YYYY';
-                
-                // Replace the date input with the text input
-                input.parentNode.replaceChild(textInput, input);
+        // Global date picker configuration
+        const defaultDateConfig = {
+            dateFormat: "d-m-Y",
+            allowInput: true,
+            parseDate: (datestr, format) => {
+                // Parse DD-MM-YYYY format
+                if (datestr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                    const [day, month, year] = datestr.split("-");
+                    return new Date(year, month - 1, day);
+                }
+                return null;
+            },
+            formatDate: (date, format) => {
+                // Format as DD-MM-YYYY
+                const day = String(date.getDate()).padStart(2, '0');
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const year = date.getFullYear();
+                return `${day}-${month}-${year}`;
+            }
+        };
 
-                // Initialize Flatpickr
-                flatpickr(textInput, {
-                    dateFormat: "d-m-Y",
-                    allowInput: true,
-                    altInput: true,
-                    altFormat: "d-m-Y",
-                    defaultHour: 12,
-                    maxDate: input.hasAttribute('max') ? 'today' : null,
-                    parseDate: (datestr, format) => {
-                        // Parse DD-MM-YYYY format
-                        if (datestr.match(/^\d{2}-\d{2}-\d{4}$/)) {
-                            const [day, month, year] = datestr.split("-");
-                            return new Date(year, month - 1, day);
+        // Initialize all date inputs with Flatpickr
+        document.addEventListener('DOMContentLoaded', function() {
+            // Convert all date inputs to text and initialize Flatpickr
+            document.querySelectorAll('input[type="date"], input.datepicker').forEach(function(input) {
+                // Create a text input to replace the date input if it's a date type
+                if (input.type === 'date') {
+                    const textInput = document.createElement('input');
+                    textInput.type = 'text';
+                    textInput.className = input.className + ' datepicker';
+                    textInput.name = input.name;
+                    textInput.id = input.id || input.name;
+                    textInput.required = input.required;
+                    textInput.placeholder = 'DD-MM-YYYY';
+                    
+                    // Replace the date input with the text input
+                    input.parentNode.replaceChild(textInput, input);
+                    input = textInput;
+                }
+
+                // Get specific configurations based on input name
+                let config = { ...defaultDateConfig };
+                
+                // Date of birth fields
+                if (input.name.includes('date_of_birth')) {
+                    config.maxDate = 'today';
+                }
+                
+                // Policy start date fields
+                if (input.name === 'start_date') {
+                    config.minDate = 'today';
+                    config.onChange = function(selectedDates) {
+                        // Update end date min date when start date changes
+                        const endDateInput = document.querySelector('input[name="end_date"]');
+                        if (endDateInput && endDateInput._flatpickr) {
+                            endDateInput._flatpickr.set('minDate', selectedDates[0] || 'today');
                         }
-                        return null;
-                    },
-                    formatDate: (date, format) => {
-                        // Format as DD-MM-YYYY
-                        const day = String(date.getDate()).padStart(2, '0');
-                        const month = String(date.getMonth() + 1).padStart(2, '0');
-                        const year = date.getFullYear();
-                        return `${day}-${month}-${year}`;
-                    },
-                    onChange: function(selectedDates, dateStr) {
-                        // Trigger change event for validation
-                        textInput.dispatchEvent(new Event('change'));
+                    };
+                }
+                
+                // Policy end date fields
+                if (input.name === 'end_date') {
+                    config.minDate = 'today';
+                }
+
+                // Initialize Flatpickr with config
+                flatpickr(input, config);
+
+                // Add validation for DD-MM-YYYY format
+                input.addEventListener('change', function() {
+                    const dateRegex = /^\d{2}-\d{2}-\d{4}$/;
+                    if (this.value && !dateRegex.test(this.value)) {
+                        this.classList.add('is-invalid');
+                        let feedback = this.nextElementSibling;
+                        if (!feedback || !feedback.classList.contains('invalid-feedback')) {
+                            feedback = document.createElement('div');
+                            feedback.className = 'invalid-feedback';
+                            this.parentNode.appendChild(feedback);
+                        }
+                        feedback.textContent = 'Please enter a valid date in DD-MM-YYYY format';
+                    } else {
+                        this.classList.remove('is-invalid');
                     }
                 });
-
-                // Set initial value if exists
-                if (input.value) {
-                    const date = new Date(input.value);
-                    const day = String(date.getDate()).padStart(2, '0');
-                    const month = String(date.getMonth() + 1).padStart(2, '0');
-                    const year = date.getFullYear();
-                    textInput._flatpickr.setDate(`${day}-${month}-${year}`);
-                }
             });
+
+            // Add custom date format validation method for jQuery Validate
+            if ($.validator) {
+                $.validator.addMethod("dateFormat", function(value, element) {
+                    return this.optional(element) || /^\d{2}-\d{2}-\d{4}$/.test(value);
+                }, "Please enter a valid date in DD-MM-YYYY format");
+
+                // Add custom validation method for end date greater than start date
+                $.validator.addMethod("greaterThan", function(value, element, param) {
+                    var startDate = $(param).val();
+                    if (!startDate || !value) return true;
+                    
+                    function parseDate(dateStr) {
+                        var parts = dateStr.split("-");
+                        return new Date(parts[2], parts[1] - 1, parts[0]);
+                    }
+                    
+                    return parseDate(value) > parseDate(startDate);
+                }, "End date must be after start date");
+            }
         });
     </script>
     

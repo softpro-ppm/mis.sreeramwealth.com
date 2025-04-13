@@ -191,7 +191,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label class="form-label">Date of Birth</label>
-                                    <input type="text" name="date_of_birth" class="form-control <?php echo (!empty($date_of_birth_err)) ? 'is-invalid' : ''; ?>" 
+                                    <input type="text" name="date_of_birth" id="date_of_birth" class="form-control datepicker <?php echo (!empty($date_of_birth_err)) ? 'is-invalid' : ''; ?>" 
                                            value="<?php echo $date_of_birth ? formatDateDMY($date_of_birth) : ''; ?>" 
                                            placeholder="DD-MM-YYYY" required>
                                     <?php if(!empty($date_of_birth_err)): ?>
@@ -222,5 +222,50 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Flatpickr for date of birth
+    flatpickr("#date_of_birth", {
+        dateFormat: "d-m-Y",
+        allowInput: true,
+        maxDate: 'today',
+        parseDate: (datestr, format) => {
+            // Parse DD-MM-YYYY format
+            if (datestr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                const [day, month, year] = datestr.split("-");
+                return new Date(year, month - 1, day);
+            }
+            return null;
+        },
+        formatDate: (date, format) => {
+            // Format as DD-MM-YYYY
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}-${month}-${year}`;
+        }
+    });
+
+    // Form validation
+    const form = document.querySelector('form');
+    form.addEventListener('submit', function(e) {
+        const dateInput = document.getElementById('date_of_birth');
+        const dateValue = dateInput.value;
+        
+        // Validate date format
+        if (!/^\d{2}-\d{2}-\d{4}$/.test(dateValue)) {
+            e.preventDefault();
+            dateInput.classList.add('is-invalid');
+            const feedback = dateInput.nextElementSibling || document.createElement('div');
+            feedback.className = 'invalid-feedback';
+            feedback.textContent = 'Please enter a valid date in DD-MM-YYYY format';
+            if (!dateInput.nextElementSibling) {
+                dateInput.parentNode.appendChild(feedback);
+            }
+        }
+    });
+});
+</script>
 
 <?php include 'includes/footer.php'; ?>

@@ -142,18 +142,11 @@ try {
 
 <?php include 'includes/header.php'; ?>
 
-<!-- Add DataTables CSS and JS -->
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
-<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.dataTables.min.css">
-<script type="text/javascript" src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
-<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
+<!-- Move all CSS links to the head section -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.2.2/css/buttons.bootstrap5.min.css">
 
+<!-- Content section -->
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Reports</h2>
@@ -306,84 +299,112 @@ try {
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?>
+<!-- Move all script tags to the end, just before closing body tag -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.2/js/buttons.print.min.js"></script>
 
 <script>
-$(document).ready(function() {
-    // Initialize DataTable with export buttons
-    var table = $('.datatable').DataTable({
-        dom: 'Bfrtip',
-        buttons: [
-            {
-                extend: 'excel',
-                className: 'btn btn-success',
-                text: '<i class="fas fa-file-excel"></i> Excel',
-                title: 'Insurance Report - ' + $('select[name="type"] option:selected').text(),
-                exportOptions: {
-                    columns: ':visible'
-                }
-            },
-            {
-                extend: 'pdf',
-                className: 'btn btn-danger',
-                text: '<i class="fas fa-file-pdf"></i> PDF',
-                title: 'Insurance Report - ' + $('select[name="type"] option:selected').text(),
-                exportOptions: {
-                    columns: ':visible'
-                }
-            },
-            {
-                extend: 'print',
-                className: 'btn btn-primary',
-                text: '<i class="fas fa-print"></i> Print',
-                title: 'Insurance Report - ' + $('select[name="type"] option:selected').text(),
-                exportOptions: {
-                    columns: ':visible'
-                }
-            }
-        ],
-        pageLength: 10,
-        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        order: [[0, 'desc']],
-        responsive: true,
-        language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search records...",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ entries",
-            infoEmpty: "Showing 0 to 0 of 0 entries",
-            infoFiltered: "(filtered from _MAX_ total entries)",
-            zeroRecords: "No matching records found",
-            paginate: {
-                first: '<i class="fas fa-angle-double-left"></i>',
-                previous: '<i class="fas fa-angle-left"></i>',
-                next: '<i class="fas fa-angle-right"></i>',
-                last: '<i class="fas fa-angle-double-right"></i>'
-            }
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait for jQuery and DataTables to be fully loaded
+    if (typeof jQuery !== 'undefined' && typeof jQuery.fn.DataTable !== 'undefined') {
+        // Destroy existing DataTable if it exists
+        if ($.fn.DataTable.isDataTable('.datatable')) {
+            $('.datatable').DataTable().destroy();
         }
-    });
 
-    // Export Report button handler
-    $('#exportReport').click(function() {
-        table.button('.buttons-excel:first').trigger();
-    });
+        // Initialize DataTable
+        var table = $('.datatable').DataTable({
+            dom: "<'row'<'col-sm-12 col-md-6'B><'col-sm-12 col-md-6'f>>" +
+                 "<'row'<'col-sm-12'tr>>" +
+                 "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+            buttons: [
+                {
+                    extend: 'excel',
+                    className: 'btn btn-success btn-sm',
+                    text: '<i class="fas fa-file-excel"></i> Excel',
+                    title: function() {
+                        return 'Insurance Report - ' + $('select[name="type"] option:selected').text();
+                    },
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'pdf',
+                    className: 'btn btn-danger btn-sm',
+                    text: '<i class="fas fa-file-pdf"></i> PDF',
+                    title: function() {
+                        return 'Insurance Report - ' + $('select[name="type"] option:selected').text();
+                    },
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                },
+                {
+                    extend: 'print',
+                    className: 'btn btn-primary btn-sm',
+                    text: '<i class="fas fa-print"></i> Print',
+                    title: function() {
+                        return 'Insurance Report - ' + $('select[name="type"] option:selected').text();
+                    },
+                    exportOptions: {
+                        columns: ':visible'
+                    }
+                }
+            ],
+            pageLength: 10,
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            order: [[0, 'desc']],
+            responsive: true,
+            language: {
+                search: "_INPUT_",
+                searchPlaceholder: "Search records...",
+                lengthMenu: "Show _MENU_ entries",
+                info: "Showing _START_ to _END_ of _TOTAL_ entries",
+                infoEmpty: "Showing 0 to 0 of 0 entries",
+                infoFiltered: "(filtered from _MAX_ total entries)",
+                zeroRecords: "No matching records found",
+                paginate: {
+                    first: '<i class="fas fa-angle-double-left"></i>',
+                    previous: '<i class="fas fa-angle-left"></i>',
+                    next: '<i class="fas fa-angle-right"></i>',
+                    last: '<i class="fas fa-angle-double-right"></i>'
+                }
+            }
+        });
 
-    // Print Report button handler
-    $('#printReport').click(function() {
-        table.button('.buttons-print:first').trigger();
-    });
+        // Custom button handlers
+        $('#exportReport').on('click', function() {
+            $('.buttons-excel:first').trigger('click');
+        });
 
-    // Style the DataTables buttons
-    $('.dt-buttons').addClass('mb-3');
-    $('.dt-buttons .dt-button').addClass('btn btn-sm mx-1');
+        $('#printReport').on('click', function() {
+            $('.buttons-print:first').trigger('click');
+        });
+
+        // Style the DataTables buttons
+        $('.dt-buttons').addClass('mb-3');
+        $('.dt-button').addClass('btn btn-sm mx-1');
+    }
 });
 </script>
 
 <style>
-/* DataTables Custom Styling */
-.dataTables_wrapper .dataTables_filter {
-    float: right;
-    margin-bottom: 1rem;
+/* DataTables Bootstrap 5 Integration Styles */
+.dataTables_wrapper .dataTables_length,
+.dataTables_wrapper .dataTables_filter,
+.dataTables_wrapper .dataTables_info,
+.dataTables_wrapper .dataTables_processing,
+.dataTables_wrapper .dataTables_paginate {
+    color: inherit;
 }
 
 .dataTables_wrapper .dataTables_filter input {
@@ -393,74 +414,72 @@ $(document).ready(function() {
     margin-left: 0.5rem;
 }
 
-.dataTables_wrapper .dataTables_length {
-    float: left;
-    margin-bottom: 1rem;
-}
-
 .dataTables_wrapper .dataTables_length select {
     border: 1px solid #dee2e6;
     border-radius: 4px;
     padding: 0.375rem 2.25rem 0.375rem 0.75rem;
 }
 
-.dataTables_wrapper .dataTables_paginate {
-    margin-top: 1rem;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button {
-    padding: 0.375rem 0.75rem;
-    margin-left: 2px;
-    border: 1px solid #dee2e6;
-    border-radius: 4px;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button.current {
-    background: #0d6efd !important;
-    border-color: #0d6efd !important;
-    color: white !important;
-}
-
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
-    background: #e9ecef !important;
-    border-color: #dee2e6 !important;
-    color: #0d6efd !important;
-}
-
-.dt-buttons {
+.dataTables_wrapper .dt-buttons {
     margin-bottom: 1rem;
 }
 
 .dt-button {
-    background-color: #fff !important;
-    border: 1px solid #dee2e6 !important;
-    border-radius: 4px !important;
-    color: #333 !important;
-    padding: 0.375rem 0.75rem !important;
-    margin-right: 0.5rem !important;
+    position: relative;
+    display: inline-block;
+    box-sizing: border-box;
+    margin-right: 0.333em;
+    padding: 0.5em 1em;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.88em;
+    line-height: 1.6;
+    color: inherit;
+    white-space: nowrap;
+    overflow: hidden;
+    background-color: white;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    text-decoration: none;
+    outline: none;
+    text-overflow: ellipsis;
 }
 
-.dt-button:hover {
-    background-color: #e9ecef !important;
-    color: #0d6efd !important;
+.dt-button:hover:not(.disabled) {
+    border: 1px solid #ced4da;
+    background-color: #e9ecef;
 }
 
 .buttons-excel {
+    color: #fff !important;
     background-color: #198754 !important;
-    color: white !important;
+    border-color: #198754 !important;
 }
 
 .buttons-pdf {
+    color: #fff !important;
     background-color: #dc3545 !important;
-    color: white !important;
+    border-color: #dc3545 !important;
 }
 
 .buttons-print {
+    color: #fff !important;
     background-color: #0d6efd !important;
-    color: white !important;
+    border-color: #0d6efd !important;
 }
 
 .table.datatable {
     margin-top: 1rem !important;
+    width: 100% !important;
 }
-</style> 
+
+.dataTables_wrapper .row {
+    margin: 0;
+    padding: 1rem 0;
+}
+</style>
+
+<?php include 'includes/footer.php'; ?> 

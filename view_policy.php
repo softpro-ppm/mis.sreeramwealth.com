@@ -21,10 +21,7 @@ if(!isset($_GET['id']) || empty($_GET['id'])) {
     exit;
 }
 
-$policy_id = $_GET['id'];
-
-// Debug output
-echo "<!-- Debug: Policy ID = " . $policy_id . " -->";
+$policy_id = intval($_GET['id']);
 
 // Get policy details with client information
 $sql = "SELECT p.*, c.name as client_name, c.email as client_email, c.phone as client_phone,
@@ -45,9 +42,6 @@ $sql = "SELECT p.*, c.name as client_name, c.email as client_email, c.phone as c
         LEFT JOIN general_insurance g ON p.id = g.policy_id
         WHERE p.id = ?";
 
-// Debug output
-echo "<!-- Debug: SQL Query = " . htmlspecialchars($sql) . " -->";
-
 $stmt = mysqli_prepare($conn, $sql);
 if (!$stmt) {
     die("Error preparing statement: " . mysqli_error($conn));
@@ -64,13 +58,12 @@ if (!$result) {
 }
 
 if(mysqli_num_rows($result) == 0) {
-    die("No policy found with ID: " . $policy_id);
+    $_SESSION['error_msg'] = "No policy found with ID: " . $policy_id;
+    header("location: policies.php");
+    exit;
 }
 
 $policy = mysqli_fetch_assoc($result);
-
-// Debug output
-echo "<!-- Debug: Policy Data = " . htmlspecialchars(print_r($policy, true)) . " -->";
 
 // Get policy documents
 $sql = "SELECT * FROM documents WHERE policy_id = ? ORDER BY created_at DESC";
@@ -119,14 +112,14 @@ include 'includes/header.php';
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Policy Number:</strong><br> <?php echo htmlspecialchars($policy['policy_number']); ?></p>
-                            <p><strong>Type:</strong><br> <?php echo ucfirst(htmlspecialchars($policy['type'])); ?></p>
+                            <p><strong>Policy Number:</strong><br> <?php echo htmlspecialchars($policy['policy_number'], ENT_QUOTES, 'UTF-8'); ?></p>
+                            <p><strong>Type:</strong><br> <?php echo ucfirst(htmlspecialchars($policy['type'], ENT_QUOTES, 'UTF-8')); ?></p>
                             <p><strong>Status:</strong><br>
                                 <span class="badge bg-<?php 
                                     echo $policy['status'] == 'active' ? 'success' : 
                                         ($policy['status'] == 'expired' ? 'danger' : 'warning'); 
                                 ?>">
-                                    <?php echo ucfirst(htmlspecialchars($policy['status'])); ?>
+                                    <?php echo ucfirst(htmlspecialchars($policy['status'], ENT_QUOTES, 'UTF-8')); ?>
                                 </span>
                             </p>
                             <p><strong>Start Date:</strong><br> <?php echo date('d M Y', strtotime($policy['start_date'])); ?></p>
@@ -136,14 +129,14 @@ include 'includes/header.php';
                             <p><strong>Coverage Amount:</strong><br> ₹<?php echo number_format($policy['coverage_amount'], 2); ?></p>
                             <p><strong>Premium:</strong><br> ₹<?php echo number_format($policy['premium'], 2); ?></p>
                             <?php if($policy['type'] == 'health'): ?>
-                                <p><strong>Coverage Type:</strong><br> <?php echo ucfirst(htmlspecialchars($policy['type_detail'])); ?></p>
+                                <p><strong>Coverage Type:</strong><br> <?php echo ucfirst(htmlspecialchars($policy['type_detail'], ENT_QUOTES, 'UTF-8')); ?></p>
                                 <p><strong>Pre-existing Conditions:</strong><br> <?php echo $policy['additional_detail'] ? 'Yes' : 'No'; ?></p>
                             <?php elseif($policy['type'] == 'life'): ?>
-                                <p><strong>Term (Years):</strong><br> <?php echo htmlspecialchars($policy['type_detail']); ?></p>
-                                <p><strong>Beneficiaries:</strong><br> <?php echo nl2br(htmlspecialchars($policy['additional_detail'])); ?></p>
+                                <p><strong>Term (Years):</strong><br> <?php echo htmlspecialchars($policy['type_detail'], ENT_QUOTES, 'UTF-8'); ?></p>
+                                <p><strong>Beneficiaries:</strong><br> <?php echo nl2br(htmlspecialchars($policy['additional_detail'], ENT_QUOTES, 'UTF-8')); ?></p>
                             <?php elseif($policy['type'] == 'general'): ?>
-                                <p><strong>Insurance Type:</strong><br> <?php echo ucfirst(htmlspecialchars($policy['type_detail'])); ?></p>
-                                <p><strong>Property Details:</strong><br> <?php echo nl2br(htmlspecialchars($policy['additional_detail'])); ?></p>
+                                <p><strong>Insurance Type:</strong><br> <?php echo ucfirst(htmlspecialchars($policy['type_detail'], ENT_QUOTES, 'UTF-8')); ?></p>
+                                <p><strong>Property Details:</strong><br> <?php echo nl2br(htmlspecialchars($policy['additional_detail'], ENT_QUOTES, 'UTF-8')); ?></p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -170,8 +163,8 @@ include 'includes/header.php';
                                 <tbody>
                                     <?php while($doc = mysqli_fetch_assoc($documents)): ?>
                                     <tr>
-                                        <td><?php echo ucwords(str_replace('_', ' ', htmlspecialchars($doc['document_type']))); ?></td>
-                                        <td><?php echo htmlspecialchars($doc['file_name']); ?></td>
+                                        <td><?php echo ucwords(str_replace('_', ' ', htmlspecialchars($doc['document_type'], ENT_QUOTES, 'UTF-8'))); ?></td>
+                                        <td><?php echo htmlspecialchars($doc['file_name'], ENT_QUOTES, 'UTF-8'); ?></td>
                                         <td><?php echo date('d M Y H:i', strtotime($doc['created_at'])); ?></td>
                                         <td>
                                             <a href="uploads/policy_documents/<?php echo urlencode($doc['file_name']); ?>" 
@@ -202,9 +195,9 @@ include 'includes/header.php';
                     <h5 class="card-title mb-0">Client Information</h5>
                 </div>
                 <div class="card-body">
-                    <p><strong>Name:</strong><br> <?php echo htmlspecialchars($policy['client_name']); ?></p>
-                    <p><strong>Email:</strong><br> <?php echo htmlspecialchars($policy['client_email']); ?></p>
-                    <p><strong>Phone:</strong><br> <?php echo htmlspecialchars($policy['client_phone']); ?></p>
+                    <p><strong>Name:</strong><br> <?php echo htmlspecialchars($policy['client_name'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>Email:</strong><br> <?php echo htmlspecialchars($policy['client_email'], ENT_QUOTES, 'UTF-8'); ?></p>
+                    <p><strong>Phone:</strong><br> <?php echo htmlspecialchars($policy['client_phone'], ENT_QUOTES, 'UTF-8'); ?></p>
                     <div class="mt-3">
                         <a href="view_client.php?id=<?php echo $policy['client_id']; ?>" class="btn btn-info btn-sm">
                             <i class="fas fa-user"></i> View Client Profile

@@ -1,6 +1,3 @@
-<?php
-session_start();
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,7 +68,7 @@ session_start();
         <?php if(isset($_SESSION['success_msg'])): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <?php 
-                echo $_SESSION['success_msg'];
+                echo htmlspecialchars($_SESSION['success_msg'], ENT_QUOTES, 'UTF-8');
                 unset($_SESSION['success_msg']);
                 ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
@@ -81,7 +78,7 @@ session_start();
         <?php if(isset($_SESSION['error_msg'])): ?>
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 <?php 
-                echo $_SESSION['error_msg'];
+                echo htmlspecialchars($_SESSION['error_msg'], ENT_QUOTES, 'UTF-8');
                 unset($_SESSION['error_msg']);
                 ?>
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>

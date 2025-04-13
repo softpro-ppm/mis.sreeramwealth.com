@@ -17,45 +17,64 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Date formatting functions -->
+    <!-- Flatpickr for better date input -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
     <script>
-        function formatDateForDisplay(dateStr) {
-            if (!dateStr) return '';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('en-GB'); // This will format as DD/MM/YYYY
-        }
-
-        function formatDateForInput(dateStr) {
-            if (!dateStr) return '';
-            const date = new Date(dateStr);
-            return date.toISOString().split('T')[0]; // This will format as YYYY-MM-DD
-        }
-
-        // Initialize date inputs when the document is ready
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Flatpickr for all date inputs
             const dateInputs = document.querySelectorAll('input[type="date"]');
-            
             dateInputs.forEach(function(input) {
-                // Create display element
-                const displaySpan = document.createElement('span');
-                displaySpan.className = 'date-display ms-2';
-                input.parentNode.insertBefore(displaySpan, input.nextSibling);
+                // Create a text input to replace the date input
+                const textInput = document.createElement('input');
+                textInput.type = 'text';
+                textInput.className = input.className;
+                textInput.name = input.name;
+                textInput.id = input.id;
+                textInput.required = input.required;
+                textInput.placeholder = 'DD-MM-YYYY';
+                
+                // Replace the date input with the text input
+                input.parentNode.replaceChild(textInput, input);
 
-                // Function to update display
-                function updateDisplay() {
-                    if (input.value) {
-                        displaySpan.textContent = '(' + formatDateForDisplay(input.value) + ')';
-                    } else {
-                        displaySpan.textContent = '';
+                // Initialize Flatpickr
+                flatpickr(textInput, {
+                    dateFormat: "d-m-Y",
+                    allowInput: true,
+                    altInput: true,
+                    altFormat: "d-m-Y",
+                    defaultHour: 12,
+                    maxDate: input.hasAttribute('max') ? 'today' : null,
+                    parseDate: (datestr, format) => {
+                        // Parse DD-MM-YYYY format
+                        if (datestr.match(/^\d{2}-\d{2}-\d{4}$/)) {
+                            const [day, month, year] = datestr.split("-");
+                            return new Date(year, month - 1, day);
+                        }
+                        return null;
+                    },
+                    formatDate: (date, format) => {
+                        // Format as DD-MM-YYYY
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const year = date.getFullYear();
+                        return `${day}-${month}-${year}`;
+                    },
+                    onChange: function(selectedDates, dateStr) {
+                        // Trigger change event for validation
+                        textInput.dispatchEvent(new Event('change'));
                     }
+                });
+
+                // Set initial value if exists
+                if (input.value) {
+                    const date = new Date(input.value);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const year = date.getFullYear();
+                    textInput._flatpickr.setDate(`${day}-${month}-${year}`);
                 }
-
-                // Update display on load
-                updateDisplay();
-
-                // Update display when date changes
-                input.addEventListener('change', updateDisplay);
-                input.addEventListener('input', updateDisplay);
             });
         });
     </script>
@@ -70,9 +89,21 @@
     .navbar-brand img {
         height: 40px;
     }
-    .date-display {
-        color: #666;
-        font-size: 0.9em;
+    /* Flatpickr custom styles */
+    .flatpickr-calendar {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 3px 13px rgba(0,0,0,0.08);
+    }
+    .flatpickr-day.selected {
+        background: #0d6efd;
+        border-color: #0d6efd;
+    }
+    .flatpickr-day.today {
+        border-color: #0d6efd;
+    }
+    .flatpickr-day:hover {
+        background: #e9ecef;
     }
     </style>
 </head>

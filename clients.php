@@ -31,6 +31,27 @@ $clients = mysqli_query($conn, $sql);
 
 <?php include 'includes/header.php'; ?>
 
+<!-- Add validation script -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/additional-methods.min.js"></script>
+
+<style>
+.error {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+input.error, textarea.error {
+    border-color: #dc3545;
+}
+input.valid, textarea.valid {
+    border-color: #198754;
+}
+.name-uppercase {
+    text-transform: uppercase;
+}
+</style>
+
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Clients</h2>
     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addClientModal">
@@ -103,10 +124,13 @@ $clients = mysqli_query($conn, $sql);
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="add_client.php" method="post">
+                <form id="clientForm" action="add_client.php" method="post">
                     <div class="mb-3">
                         <label class="form-label">Name</label>
-                        <input type="text" class="form-control" name="name" required>
+                        <input type="text" class="form-control name-uppercase" name="name" required 
+                               pattern="[A-Z\s]+" title="Please use uppercase letters only"
+                               oninput="this.value = this.value.toUpperCase()">
+                        <small class="form-text text-muted">Name should be in uppercase letters only</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email</label>
@@ -114,7 +138,9 @@ $clients = mysqli_query($conn, $sql);
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Phone</label>
-                        <input type="tel" class="form-control" name="phone" required>
+                        <input type="tel" class="form-control" name="phone" required
+                               pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
+                        <small class="form-text text-muted">Enter 10-digit phone number</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Date of Birth</label>
@@ -122,7 +148,7 @@ $clients = mysqli_query($conn, $sql);
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Address</label>
-                        <textarea class="form-control" name="address" rows="3" required></textarea>
+                        <textarea class="form-control" name="address" rows="3" required minlength="10"></textarea>
                     </div>
                     <div class="text-end">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -133,5 +159,95 @@ $clients = mysqli_query($conn, $sql);
         </div>
     </div>
 </div>
+
+<script>
+$(document).ready(function() {
+    // Initialize form validation
+    $("#clientForm").validate({
+        rules: {
+            name: {
+                required: true,
+                pattern: /^[A-Z\s]+$/
+            },
+            email: {
+                required: true,
+                email: true,
+                remote: {
+                    url: "check_email.php",
+                    type: "post"
+                }
+            },
+            phone: {
+                required: true,
+                pattern: /^[0-9]{10}$/,
+                minlength: 10,
+                maxlength: 10
+            },
+            date_of_birth: {
+                required: true,
+                date: true
+            },
+            address: {
+                required: true,
+                minlength: 10
+            }
+        },
+        messages: {
+            name: {
+                required: "Please enter client name",
+                pattern: "Name must be in uppercase letters only"
+            },
+            email: {
+                required: "Please enter email address",
+                email: "Please enter a valid email address",
+                remote: "This email is already registered"
+            },
+            phone: {
+                required: "Please enter phone number",
+                pattern: "Please enter a valid 10-digit phone number",
+                minlength: "Phone number must be 10 digits",
+                maxlength: "Phone number must be 10 digits"
+            },
+            date_of_birth: {
+                required: "Please enter date of birth",
+                date: "Please enter a valid date"
+            },
+            address: {
+                required: "Please enter address",
+                minlength: "Address must be at least 10 characters long"
+            }
+        },
+        errorElement: 'span',
+        errorPlacement: function(error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.mb-3').append(error);
+        },
+        highlight: function(element, errorClass, validClass) {
+            $(element).addClass('is-invalid').removeClass('is-valid');
+        },
+        unhighlight: function(element, errorClass, validClass) {
+            $(element).removeClass('is-invalid').addClass('is-valid');
+        },
+        submitHandler: function(form) {
+            // Convert name to uppercase before submitting
+            $('input[name="name"]').val($('input[name="name"]').val().toUpperCase());
+            form.submit();
+        }
+    });
+
+    // Auto-uppercase for name input
+    $('input[name="name"]').on('input', function() {
+        $(this).val($(this).val().toUpperCase());
+    });
+
+    // Phone number validation
+    $('input[name="phone"]').on('input', function() {
+        this.value = this.value.replace(/[^0-9]/g, '');
+        if (this.value.length > 10) {
+            this.value = this.value.slice(0, 10);
+        }
+    });
+});
+</script>
 
 <?php include 'includes/footer.php'; ?> 

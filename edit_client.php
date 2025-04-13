@@ -135,6 +135,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Close connection
     mysqli_close($conn);
 }
+
+function formatDateDMY($date) {
+    return date('d-m-Y', strtotime($date));
+}
 ?>
 
 <?php include 'includes/header.php'; ?>
@@ -182,8 +186,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <div class="col-md-6">
                         <div class="mb-3">
                             <label class="form-label">Date of Birth</label>
-                            <input type="date" name="date_of_birth" class="form-control <?php echo (!empty($date_of_birth_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $date_of_birth; ?>">
-                            <div class="invalid-feedback"><?php echo $date_of_birth_err; ?></div>
+                            <input type="text" name="date_of_birth" class="form-control <?php echo (!empty($date_of_birth_err)) ? 'is-invalid' : ''; ?>" 
+                                   value="<?php echo $date_of_birth ? formatDateDMY($date_of_birth) : ''; ?>" 
+                                   placeholder="DD-MM-YYYY" required>
+                            <?php if(!empty($date_of_birth_err)): ?>
+                                <div class="invalid-feedback"><?php echo $date_of_birth_err; ?></div>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>

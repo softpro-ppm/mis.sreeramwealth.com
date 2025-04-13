@@ -117,7 +117,7 @@ $policies = mysqli_query($conn, $sql);
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="add_policy.php" method="post" enctype="multipart/form-data">
+                <form action="add_policy.php" method="post" enctype="multipart/form-data" id="policyForm">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Policy Type</label>
@@ -178,11 +178,13 @@ $policies = mysqli_query($conn, $sql);
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Start Date</label>
-                            <input type="date" class="form-control datepicker" name="start_date" required>
+                            <input type="text" class="form-control" name="start_date" 
+                                   placeholder="DD-MM-YYYY" required>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label class="form-label">End Date</label>
-                            <input type="date" class="form-control datepicker" name="end_date" required>
+                            <input type="text" class="form-control" name="end_date" 
+                                   placeholder="DD-MM-YYYY" required>
                         </div>
                     </div>
                     <div class="row">
@@ -260,78 +262,98 @@ $policies = mysqli_query($conn, $sql);
 
 <!-- Add this right before the closing </body> tag, after including footer.php -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Handle dynamic document upload fields
-    $(document).on('click', '.add-document', function() {
-        var documentRow = `
-            <div class="row document-row mb-3">
-                <div class="col-md-5">
-                    <label class="form-label">Document Type</label>
-                    <select class="form-select" name="document_type[]" required>
-                        <option value="">Select Document Type</option>
-                        <option value="policy">Policy Document</option>
-                        <option value="id_proof">ID Proof</option>
-                        <option value="address_proof">Address Proof</option>
-                        <option value="medical">Medical Report</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-                <div class="col-md-5">
-                    <label class="form-label">Upload File</label>
-                    <input type="file" class="form-control" name="document_file[]" required 
-                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
-                    <div class="form-text">Max file size: 5MB. Allowed types: PDF, DOC, DOCX, JPG, PNG</div>
-                </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button type="button" class="btn btn-danger remove-document">
-                        <i class="fas fa-minus"></i>
-                    </button>
-                </div>
-            </div>
-        `;
-        
-        $('.document-upload-container').append(documentRow);
-    });
-
-    // Handle remove button click
-    $(document).on('click', '.remove-document', function() {
-        $(this).closest('.document-row').remove();
-    });
-
-    // File size and type validation
-    $(document).on('change', 'input[type="file"]', function() {
-        var maxSize = 5 * 1024 * 1024; // 5MB
-        var allowedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
-        var fileName = this.value.toLowerCase();
-        var validFile = false;
-        
-        // Check file extension
-        for(var i = 0; i < allowedTypes.length; i++) {
-            if(fileName.endsWith(allowedTypes[i])) {
-                validFile = true;
-                break;
+$(document).ready(function() {
+    // Initialize form validation
+    $("#policyForm").validate({
+        rules: {
+            policy_number: {
+                required: true,
+                minlength: 5
+            },
+            type: "required",
+            start_date: {
+                required: true,
+                dateFormat: true
+            },
+            end_date: {
+                required: true,
+                dateFormat: true,
+                greaterThan: "#start_date"
+            },
+            premium: {
+                required: true,
+                number: true,
+                min: 0
+            },
+            coverage_amount: {
+                required: true,
+                number: true,
+                min: 0
             }
+        },
+        messages: {
+            policy_number: {
+                required: "Please enter policy number",
+                minlength: "Policy number must be at least 5 characters"
+            },
+            type: "Please select policy type",
+            start_date: {
+                required: "Please enter start date",
+                dateFormat: "Please enter a valid date in DD-MM-YYYY format"
+            },
+            end_date: {
+                required: "Please enter end date",
+                dateFormat: "Please enter a valid date in DD-MM-YYYY format",
+                greaterThan: "End date must be after start date"
+            },
+            premium: {
+                required: "Please enter premium amount",
+                number: "Please enter a valid number",
+                min: "Premium cannot be negative"
+            },
+            coverage_amount: {
+                required: "Please enter coverage amount",
+                number: "Please enter a valid number",
+                min: "Coverage amount cannot be negative"
+            }
+        },
+        errorElement: 'div',
+        errorPlacement: function(error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.mb-3').append(error);
+        },
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
         }
-        
-        if (!validFile) {
-            alert('Invalid file type. Please upload PDF, DOC, DOCX, JPG, or PNG files only.');
-            $(this).val('');
-            return;
-        }
-        
-        // Check file size
-        if (this.files[0] && this.files[0].size > maxSize) {
-            alert('File size exceeds 5MB limit');
-            $(this).val('');
-            return;
-        }
+    });
 
-        // Show selected filename
-        if (this.files[0]) {
-            $(this).next('.form-text').html('Selected file: ' + this.files[0].name);
-        } else {
-            $(this).next('.form-text').html('Max file size: 5MB. Allowed types: PDF, DOC, DOCX, JPG, PNG');
+    // Add custom date format validation method
+    $.validator.addMethod("dateFormat", function(value, element) {
+        return this.optional(element) || /^\d{2}-\d{2}-\d{4}$/.test(value);
+    });
+
+    // Add custom validation method for end date greater than start date
+    $.validator.addMethod("greaterThan", function(value, element, param) {
+        var startDate = $(param).val();
+        if (!startDate || !value) return true;
+        
+        function parseDate(dateStr) {
+            var parts = dateStr.split("-");
+            return new Date(parts[2], parts[1] - 1, parts[0]);
+        }
+        
+        return parseDate(value) > parseDate(startDate);
+    });
+
+    // Delete confirmation
+    $('.delete-btn').on('click', function(e) {
+        if(!confirm('Are you sure you want to delete this policy?')) {
+            e.preventDefault();
         }
     });
 });

@@ -264,16 +264,18 @@ include 'includes/header.php';
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Start Date</label>
-                                <input type="date" class="form-control" name="start_date" 
-                                       value="<?php echo $policy['start_date']; ?>" required>
+                                <input type="text" class="form-control" name="start_date" 
+                                       value="<?php echo formatDateDMY($policy['start_date']); ?>" 
+                                       placeholder="DD-MM-YYYY" required>
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">End Date</label>
-                                <input type="date" class="form-control" name="end_date" 
-                                       value="<?php echo $policy['end_date']; ?>" required>
+                                <input type="text" class="form-control" name="end_date" 
+                                       value="<?php echo formatDateDMY($policy['end_date']); ?>" 
+                                       placeholder="DD-MM-YYYY" required>
                             </div>
                         </div>
 
@@ -566,6 +568,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+function formatDateDMY($date) {
+    return date('d-m-Y', strtotime($date));
+}
 </script>
 
-<?php include 'includes/footer.php'; ?> 
+<?php include 'includes/footer.php'; ?>

@@ -309,31 +309,167 @@ try {
 
 <script>
 $(document).ready(function() {
-    // Initialize DataTable
+    // Destroy existing DataTable if it exists
+    if ($.fn.DataTable.isDataTable('.datatable')) {
+        $('.datatable').DataTable().destroy();
+    }
+    
+    // Initialize DataTable with improved configuration
     var table = $('.datatable').DataTable({
-        dom: 'Bfrtip',
+        dom: '<"row"<"col-sm-6"B><"col-sm-6"f>>' +
+             '<"row"<"col-sm-12"tr>>' +
+             '<"row"<"col-sm-5"i><"col-sm-7"p>>',
         buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
+            {
+                extend: 'collection',
+                text: '<i class="fas fa-download"></i> Export',
+                buttons: [
+                    {
+                        extend: 'excel',
+                        text: '<i class="fas fa-file-excel"></i> Excel',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fas fa-file-pdf"></i> PDF',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    },
+                    {
+                        extend: 'csv',
+                        text: '<i class="fas fa-file-csv"></i> CSV',
+                        exportOptions: {
+                            columns: ':visible'
+                        }
+                    }
+                ]
+            },
+            {
+                extend: 'print',
+                text: '<i class="fas fa-print"></i> Print',
+                exportOptions: {
+                    columns: ':visible'
+                }
+            }
         ],
-        pageLength: 25,
+        pageLength: 10,
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
         order: [[0, 'desc']],
+        responsive: true,
         language: {
-            search: "Search:",
+            search: "_INPUT_",
+            searchPlaceholder: "Search records...",
             lengthMenu: "Show _MENU_ entries",
             info: "Showing _START_ to _END_ of _TOTAL_ entries",
             infoEmpty: "Showing 0 to 0 of 0 entries",
-            infoFiltered: "(filtered from _MAX_ total entries)"
+            infoFiltered: "(filtered from _MAX_ total entries)",
+            zeroRecords: "No matching records found",
+            paginate: {
+                first: '<i class="fas fa-angle-double-left"></i>',
+                previous: '<i class="fas fa-angle-left"></i>',
+                next: '<i class="fas fa-angle-right"></i>',
+                last: '<i class="fas fa-angle-double-right"></i>'
+            }
         }
     });
 
-    // Export Report
+    // Custom positioning of Buttons
+    $('.dt-buttons').addClass('mb-3');
+    
+    // Export Report button handler
     $('#exportReport').click(function() {
-        table.button('excel').trigger();
+        $('.dt-button-collection').remove(); // Remove any existing collection
+        table.button('.buttons-excel').trigger();
     });
 
-    // Print Report
+    // Print Report button handler
     $('#printReport').click(function() {
-        table.button('print').trigger();
+        table.button('.buttons-print').trigger();
     });
 });
-</script> 
+</script>
+
+<style>
+/* DataTables Custom Styling */
+.dataTables_wrapper .dataTables_filter {
+    float: right;
+    margin-bottom: 1rem;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.375rem 0.75rem;
+    margin-left: 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_length {
+    float: left;
+    margin-bottom: 1rem;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 0.375rem 2.25rem 0.375rem 0.75rem;
+}
+
+.dataTables_wrapper .dataTables_paginate {
+    margin-top: 1rem;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button {
+    padding: 0.375rem 0.75rem;
+    margin-left: 2px;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button.current {
+    background: #0d6efd;
+    border-color: #0d6efd;
+    color: white !important;
+}
+
+.dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+    background: #e9ecef;
+    border-color: #dee2e6;
+    color: #0d6efd !important;
+}
+
+.dt-buttons .btn {
+    margin-right: 0.5rem;
+}
+
+.table.datatable {
+    margin-top: 1rem !important;
+}
+
+.dataTables_wrapper .dt-buttons {
+    margin-bottom: 1rem;
+}
+
+.dt-button-collection {
+    padding: 0.5rem;
+    border-radius: 4px;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.dt-button-collection .dt-button {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    margin-bottom: 0.25rem;
+    text-align: left;
+    border: none;
+    background: none;
+}
+
+.dt-button-collection .dt-button:hover {
+    background-color: #e9ecef;
+    color: #0d6efd;
+}
+</style> 

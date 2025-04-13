@@ -90,7 +90,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty(trim($_POST["date_of_birth"]))){
         $date_of_birth_err = "Please enter date of birth.";
     } else{
-        $date_of_birth = trim($_POST["date_of_birth"]);
+        $date_of_birth = date('Y-m-d', strtotime(trim($_POST["date_of_birth"])));
     }
     
     // Validate address
@@ -114,7 +114,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $param_name = $name;
             $param_email = $email;
             $param_phone = $phone;
-            $param_dob = $date_of_birth;
+            $param_dob = date('Y-m-d', strtotime($date_of_birth));
             $param_address = $address;
             $param_id = $client_id;
             

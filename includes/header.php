@@ -27,6 +27,10 @@
     .navbar-brand img {
         height: 40px;
     }
+    .date-display {
+        color: #666;
+        font-size: 0.9em;
+    }
     </style>
 </head>
 <body>
@@ -86,5 +90,45 @@
             </div>
         <?php endif; ?>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Format date inputs to DD-MM-YYYY
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(function(input) {
+                // When displaying a date value
+                if (input.value) {
+                    const date = new Date(input.value);
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const displayValue = `${day}-${month}-${date.getFullYear()}`;
+                    input.dataset.displayValue = displayValue;
+                }
+
+                // Create a span to show formatted date
+                const displaySpan = document.createElement('span');
+                displaySpan.className = 'date-display';
+                displaySpan.style.marginLeft = '10px';
+                input.parentNode.insertBefore(displaySpan, input.nextSibling);
+
+                // Update display when date changes
+                input.addEventListener('change', function() {
+                    if (this.value) {
+                        const date = new Date(this.value);
+                        const day = String(date.getDate()).padStart(2, '0');
+                        const month = String(date.getMonth() + 1).padStart(2, '0');
+                        const displayValue = `${day}-${month}-${date.getFullYear()}`;
+                        this.dataset.displayValue = displayValue;
+                        displaySpan.textContent = `(${displayValue})`;
+                    } else {
+                        displaySpan.textContent = '';
+                    }
+                });
+
+                // Trigger change event to format existing dates
+                const event = new Event('change');
+                input.dispatchEvent(event);
+            });
+        });
+    </script>
 </body>
-</html> 
+</html>

@@ -26,8 +26,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     $status = mysqli_real_escape_string($conn, $_POST['status']);
     $coverage_amount = floatval($_POST['coverage_amount']);
     $premium = floatval($_POST['premium']);
-    $start_date = mysqli_real_escape_string($conn, $_POST['start_date']);
-    $end_date = mysqli_real_escape_string($conn, $_POST['end_date']);
+    
+    // Validate start date
+    if(empty(trim($_POST["start_date"]))){
+        $start_date_err = "Please enter start date.";
+    } else{
+        $start_date = date('Y-m-d', strtotime(trim($_POST["start_date"])));
+    }
+    
+    // Validate end date
+    if(empty(trim($_POST["end_date"]))){
+        $end_date_err = "Please enter end date.";
+    } else{
+        $end_date = date('Y-m-d', strtotime(trim($_POST["end_date"])));
+    }
 
     // Update policy details
     $sql = "UPDATE policies SET 
@@ -40,7 +52,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             WHERE id = ?";
 
     $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "sddssi", $status, $coverage_amount, $premium, $start_date, $end_date, $policy_id);
+    $param_start_date = date('Y-m-d', strtotime($start_date));
+    $param_end_date = date('Y-m-d', strtotime($end_date));
+    mysqli_stmt_bind_param($stmt, "sddssi", $status, $coverage_amount, $premium, $param_start_date, $param_end_date, $policy_id);
     
     if(mysqli_stmt_execute($stmt)) {
         // Update type-specific details

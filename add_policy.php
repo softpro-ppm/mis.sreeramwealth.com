@@ -41,17 +41,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         $type = trim($_POST["type"]);
     }
     
-    // Validate dates
+    // Validate start date
     if(empty(trim($_POST["start_date"]))){
         $start_date_err = "Please enter start date.";
     } else{
-        $start_date = trim($_POST["start_date"]);
+        $start_date = date('Y-m-d', strtotime(trim($_POST["start_date"])));
     }
     
+    // Validate end date
     if(empty(trim($_POST["end_date"]))){
         $end_date_err = "Please enter end date.";
     } else{
-        $end_date = trim($_POST["end_date"]);
+        $end_date = date('Y-m-d', strtotime(trim($_POST["end_date"])));
     }
     
     // Validate premium
@@ -80,12 +81,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')";
             
             if($stmt = mysqli_prepare($conn, $sql)){
+                $param_start_date = date('Y-m-d', strtotime($start_date));
+                $param_end_date = date('Y-m-d', strtotime($end_date));
                 mysqli_stmt_bind_param($stmt, "sisssdd", 
                     $policy_number,
                     $client_id,
                     $type,
-                    $start_date,
-                    $end_date,
+                    $param_start_date,
+                    $param_end_date,
                     $premium,
                     $coverage_amount
                 );

@@ -130,7 +130,6 @@ input.valid, textarea.valid {
                         <input type="text" class="form-control name-uppercase" name="name" required 
                                pattern="[A-Z\s]+" title="Please use uppercase letters only"
                                oninput="this.value = this.value.toUpperCase()">
-                        <small class="form-text text-muted">Name should be in uppercase letters only</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Email</label>

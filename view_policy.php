@@ -93,6 +93,11 @@ echo "<!-- Debug: Database Connected = " . ($conn ? "Yes" : "No") . " -->";
 
 // Include header
 include 'includes/header.php';
+
+// Helper function to safely convert first character to uppercase
+function safeUcfirst($str) {
+    return $str ? mb_strtoupper(mb_substr($str, 0, 1)) . mb_substr($str, 1) : '';
+}
 ?>
 
 <div class="container-fluid px-4">
@@ -118,14 +123,14 @@ include 'includes/header.php';
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-6">
-                            <p><strong>Policy Number:</strong><br> <?php echo $policy['policy_number']; ?></p>
-                            <p><strong>Type:</strong><br> <?php echo ucfirst($policy['type']); ?></p>
+                            <p><strong>Policy Number:</strong><br> <?php echo htmlspecialchars($policy['policy_number']); ?></p>
+                            <p><strong>Type:</strong><br> <?php echo safeUcfirst(htmlspecialchars($policy['type'])); ?></p>
                             <p><strong>Status:</strong><br>
                                 <span class="badge bg-<?php 
                                     echo $policy['status'] == 'active' ? 'success' : 
                                         ($policy['status'] == 'expired' ? 'danger' : 'warning'); 
                                 ?>">
-                                    <?php echo ucfirst($policy['status']); ?>
+                                    <?php echo safeUcfirst(htmlspecialchars($policy['status'])); ?>
                                 </span>
                             </p>
                             <p><strong>Start Date:</strong><br> <?php echo date('d M Y', strtotime($policy['start_date'])); ?></p>
@@ -135,14 +140,14 @@ include 'includes/header.php';
                             <p><strong>Coverage Amount:</strong><br> ₹<?php echo number_format((float)$policy['coverage_amount']); ?></p>
                             <p><strong>Premium:</strong><br> ₹<?php echo number_format((float)$policy['premium']); ?></p>
                             <?php if($policy['type'] == 'health'): ?>
-                                <p><strong>Coverage Type:</strong><br> <?php echo ucfirst($policy['type_detail']); ?></p>
+                                <p><strong>Coverage Type:</strong><br> <?php echo safeUcfirst(htmlspecialchars($policy['type_detail'])); ?></p>
                                 <p><strong>Pre-existing Conditions:</strong><br> <?php echo $policy['additional_detail'] ? 'Yes' : 'No'; ?></p>
                             <?php elseif($policy['type'] == 'life'): ?>
-                                <p><strong>Term (Years):</strong><br> <?php echo $policy['type_detail']; ?></p>
-                                <p><strong>Beneficiaries:</strong><br> <?php echo nl2br($policy['additional_detail']); ?></p>
+                                <p><strong>Term (Years):</strong><br> <?php echo htmlspecialchars($policy['type_detail']); ?></p>
+                                <p><strong>Beneficiaries:</strong><br> <?php echo str_replace("\n", '<br>', htmlspecialchars($policy['additional_detail'])); ?></p>
                             <?php elseif($policy['type'] == 'general'): ?>
-                                <p><strong>Insurance Type:</strong><br> <?php echo ucfirst($policy['type_detail']); ?></p>
-                                <p><strong>Property Details:</strong><br> <?php echo nl2br($policy['additional_detail']); ?></p>
+                                <p><strong>Insurance Type:</strong><br> <?php echo safeUcfirst(htmlspecialchars($policy['type_detail'])); ?></p>
+                                <p><strong>Property Details:</strong><br> <?php echo str_replace("\n", '<br>', htmlspecialchars($policy['additional_detail'])); ?></p>
                             <?php endif; ?>
                         </div>
                     </div>
@@ -169,19 +174,19 @@ include 'includes/header.php';
                                 <tbody>
                                     <?php while($doc = mysqli_fetch_assoc($documents)): ?>
                                     <tr>
-                                        <td><?php echo ucwords(str_replace('_', ' ', $doc['document_type'])); ?></td>
-                                        <td><?php echo $doc['file_name']; ?></td>
+                                        <td><?php echo ucwords(str_replace('_', ' ', htmlspecialchars($doc['document_type']))); ?></td>
+                                        <td><?php echo htmlspecialchars($doc['file_name']); ?></td>
                                         <td><?php echo date('d M Y H:i', strtotime($doc['created_at'])); ?></td>
                                         <td>
                                             <?php 
-                                            $file_path = $upload_dir . $doc['file_path'];
+                                            $file_path = $upload_dir . $doc['file_name'];
                                             if(file_exists($file_path)): 
                                             ?>
-                                            <a href="<?php echo $file_path; ?>" 
+                                            <a href="<?php echo htmlspecialchars($file_path); ?>" 
                                                class="btn btn-sm btn-info" target="_blank" title="View">
                                                 <i class="fas fa-eye"></i>
                                             </a>
-                                            <a href="<?php echo $file_path; ?>" 
+                                            <a href="<?php echo htmlspecialchars($file_path); ?>" 
                                                class="btn btn-sm btn-success" download title="Download">
                                                 <i class="fas fa-download"></i>
                                             </a>
@@ -208,9 +213,9 @@ include 'includes/header.php';
                     <h5 class="card-title mb-0">Client Information</h5>
                 </div>
                 <div class="card-body">
-                    <p><strong>Name:</strong><br> <?php echo $policy['client_name']; ?></p>
-                    <p><strong>Email:</strong><br> <?php echo $policy['client_email']; ?></p>
-                    <p><strong>Phone:</strong><br> <?php echo $policy['client_phone']; ?></p>
+                    <p><strong>Name:</strong><br> <?php echo htmlspecialchars($policy['client_name']); ?></p>
+                    <p><strong>Email:</strong><br> <?php echo htmlspecialchars($policy['client_email']); ?></p>
+                    <p><strong>Phone:</strong><br> <?php echo htmlspecialchars($policy['client_phone']); ?></p>
                     <div class="mt-3">
                         <a href="view_client.php?id=<?php echo $policy['client_id']; ?>" class="btn btn-info btn-sm">
                             <i class="fas fa-user"></i> View Client Profile

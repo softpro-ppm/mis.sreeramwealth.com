@@ -80,6 +80,7 @@ input.valid, textarea.valid {
             <table class="table table-striped datatable">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
@@ -89,8 +90,12 @@ input.valid, textarea.valid {
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while($client = mysqli_fetch_assoc($clients)): ?>
+                    <?php 
+                    $serial = 1;
+                    while($client = mysqli_fetch_assoc($clients)): 
+                    ?>
                     <tr>
+                        <td><?php echo $serial++; ?></td>
                         <td><?php echo $client['name']; ?></td>
                         <td><?php echo $client['email']; ?></td>
                         <td><?php echo $client['phone']; ?></td>
@@ -139,7 +144,6 @@ input.valid, textarea.valid {
                         <label class="form-label">Phone</label>
                         <input type="tel" class="form-control" name="phone" required
                                pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number">
-                        <small class="form-text text-muted">Enter 10-digit phone number</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Date of Birth</label>

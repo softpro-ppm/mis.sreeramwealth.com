@@ -1,4 +1,8 @@
 <?php
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Initialize the session
 session_start();
  
@@ -19,6 +23,9 @@ if(!isset($_GET['id']) || empty($_GET['id'])) {
 
 $policy_id = $_GET['id'];
 
+// Debug output
+echo "<!-- Debug: Policy ID = " . $policy_id . " -->";
+
 // Get policy details with client information
 $sql = "SELECT p.*, c.name as client_name, c.email as client_email, c.phone as client_phone,
         CASE 
@@ -38,25 +45,54 @@ $sql = "SELECT p.*, c.name as client_name, c.email as client_email, c.phone as c
         LEFT JOIN general_insurance g ON p.id = g.policy_id
         WHERE p.id = ?";
 
+// Debug output
+echo "<!-- Debug: SQL Query = " . htmlspecialchars($sql) . " -->";
+
 $stmt = mysqli_prepare($conn, $sql);
+if (!$stmt) {
+    die("Error preparing statement: " . mysqli_error($conn));
+}
+
 mysqli_stmt_bind_param($stmt, "i", $policy_id);
-mysqli_stmt_execute($stmt);
+if (!mysqli_stmt_execute($stmt)) {
+    die("Error executing statement: " . mysqli_stmt_error($stmt));
+}
+
 $result = mysqli_stmt_get_result($stmt);
+if (!$result) {
+    die("Error getting result: " . mysqli_error($conn));
+}
 
 if(mysqli_num_rows($result) == 0) {
-    header("location: policies.php");
-    exit;
+    die("No policy found with ID: " . $policy_id);
 }
 
 $policy = mysqli_fetch_assoc($result);
 
+// Debug output
+echo "<!-- Debug: Policy Data = " . htmlspecialchars(print_r($policy, true)) . " -->";
+
 // Get policy documents
 $sql = "SELECT * FROM documents WHERE policy_id = ? ORDER BY created_at DESC";
 $stmt = mysqli_prepare($conn, $sql);
-mysqli_stmt_bind_param($stmt, "i", $policy_id);
-mysqli_stmt_execute($stmt);
-$documents = mysqli_stmt_get_result($stmt);
+if (!$stmt) {
+    die("Error preparing documents statement: " . mysqli_error($conn));
+}
 
+mysqli_stmt_bind_param($stmt, "i", $policy_id);
+if (!mysqli_stmt_execute($stmt)) {
+    die("Error executing documents statement: " . mysqli_stmt_error($stmt));
+}
+
+$documents = mysqli_stmt_get_result($stmt);
+if (!$documents) {
+    die("Error getting documents result: " . mysqli_error($conn));
+}
+
+// Debug database connection
+echo "<!-- Debug: Database Connected = " . ($conn ? "Yes" : "No") . " -->";
+
+// Include header
 include 'includes/header.php';
 ?>
 

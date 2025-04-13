@@ -18,12 +18,14 @@ $policy_number_err = $client_id_err = $type_err = $start_date_err = $end_date_er
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
     
-    // Validate policy number
-    if(empty(trim($_POST["policy_number"]))){
-        $policy_number = "POL" . date('Ymd') . rand(1000, 9999);
-    } else{
-        $policy_number = trim($_POST["policy_number"]);
+    // Create uploads directory if it doesn't exist
+    $upload_dir = "uploads/policy_documents/";
+    if (!file_exists($upload_dir)) {
+        mkdir($upload_dir, 0777, true);
     }
+
+    // Generate policy number
+    $policy_number = 'POL' . date('Ymd') . rand(100000, 999999);
     
     // Validate client
     if(empty(trim($_POST["client_id"]))){
@@ -73,37 +75,109 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         mysqli_begin_transaction($conn);
         
         try {
-            // Insert into policies table
-            $sql = "INSERT INTO policies (policy_number, client_id, type, start_date, end_date, premium, coverage_amount, status) VALUES (?, ?, ?, ?, ?, ?, ?, 'active')";
+            // Prepare policy insert statement
+            $sql = "INSERT INTO policies (policy_number, client_id, type, start_date, end_date, premium, coverage_amount, status) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')";
             
             if($stmt = mysqli_prepare($conn, $sql)){
-                mysqli_stmt_bind_param($stmt, "sisssdd", $policy_number, $client_id, $type, $start_date, $end_date, $premium, $coverage_amount);
+                mysqli_stmt_bind_param($stmt, "sisssdd", 
+                    $policy_number,
+                    $client_id,
+                    $type,
+                    $start_date,
+                    $end_date,
+                    $premium,
+                    $coverage_amount
+                );
                 
                 if(mysqli_stmt_execute($stmt)){
                     $policy_id = mysqli_insert_id($conn);
                     
-                    // Insert into specific policy type table
+                    // Handle document uploads
+                    if(isset($_FILES['document_file'])) {
+                        $document_types = $_POST['document_type'];
+                        $files = $_FILES['document_file'];
+                        
+                        for($i = 0; $i < count($files['name']); $i++) {
+                            if($files['error'][$i] == 0) {
+                                $file_name = $files['name'][$i];
+                                $file_tmp = $files['tmp_name'][$i];
+                                $file_type = $files['type'][$i];
+                                $file_size = $files['size'][$i];
+                                
+                                // Generate unique filename
+                                $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
+                                $unique_file = $policy_number . '_' . $document_types[$i] . '_' . uniqid() . '.' . $file_ext;
+                                $destination = $upload_dir . $unique_file;
+                                
+                                // Check file size (5MB limit)
+                                if($file_size > 5242880) {
+                                    continue;
+                                }
+                                
+                                // Check file type
+                                $allowed = array('pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png');
+                                if(!in_array($file_ext, $allowed)) {
+                                    continue;
+                                }
+                                
+                                // Move uploaded file
+                                if(move_uploaded_file($file_tmp, $destination)) {
+                                    // Insert document record
+                                    $sql = "INSERT INTO documents (policy_id, document_type, file_name, file_path) VALUES (?, ?, ?, ?)";
+                                    if($stmt2 = mysqli_prepare($conn, $sql)) {
+                                        mysqli_stmt_bind_param($stmt2, "isss", 
+                                            $policy_id,
+                                            $document_types[$i],
+                                            $file_name,
+                                            $unique_file
+                                        );
+                                        mysqli_stmt_execute($stmt2);
+                                        mysqli_stmt_close($stmt2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Handle specific insurance type details
                     switch($type) {
                         case 'health':
-                            $sql = "INSERT INTO health_insurance_details (policy_id, coverage_type, pre_existing_conditions, family_coverage) VALUES (?, ?, ?, ?)";
-                            $stmt = mysqli_prepare($conn, $sql);
-                            mysqli_stmt_bind_param($stmt, "isii", $policy_id, $_POST['health']['coverage_type'], $_POST['health']['pre_existing_conditions'], $_POST['health']['family_coverage']);
+                            $sql = "INSERT INTO health_insurance_details (policy_id, coverage_type, pre_existing_conditions) 
+                                    VALUES (?, ?, ?)";
+                            $stmt2 = mysqli_prepare($conn, $sql);
+                            $pre_existing = isset($_POST['health']['pre_existing_conditions']) ? 1 : 0;
+                            mysqli_stmt_bind_param($stmt2, "isi", 
+                                $policy_id,
+                                $_POST['health']['coverage_type'],
+                                $pre_existing
+                            );
                             break;
                             
                         case 'life':
-                            $sql = "INSERT INTO life_insurance_details (policy_id, term_years, beneficiaries) VALUES (?, ?, ?)";
-                            $stmt = mysqli_prepare($conn, $sql);
-                            mysqli_stmt_bind_param($stmt, "iis", $policy_id, $_POST['life']['term_years'], $_POST['life']['beneficiaries']);
+                            $sql = "INSERT INTO life_insurance_details (policy_id, term_years, beneficiaries) 
+                                    VALUES (?, ?, ?)";
+                            $stmt2 = mysqli_prepare($conn, $sql);
+                            mysqli_stmt_bind_param($stmt2, "iis", 
+                                $policy_id,
+                                $_POST['life']['term_years'],
+                                $_POST['life']['beneficiaries']
+                            );
                             break;
                             
                         case 'general':
-                            $sql = "INSERT INTO general_insurance_details (policy_id, insurance_type, property_details) VALUES (?, ?, ?)";
-                            $stmt = mysqli_prepare($conn, $sql);
-                            mysqli_stmt_bind_param($stmt, "iss", $policy_id, $_POST['general']['insurance_type'], $_POST['general']['property_details']);
+                            $sql = "INSERT INTO general_insurance_details (policy_id, insurance_type, property_details) 
+                                    VALUES (?, ?, ?)";
+                            $stmt2 = mysqli_prepare($conn, $sql);
+                            mysqli_stmt_bind_param($stmt2, "iss", 
+                                $policy_id,
+                                $_POST['general']['insurance_type'],
+                                $_POST['general']['property_details']
+                            );
                             break;
                     }
                     
-                    if(mysqli_stmt_execute($stmt)){
+                    if(mysqli_stmt_execute($stmt2)){
                         // Commit transaction
                         mysqli_commit($conn);
                         header("location: policies.php?status=added");

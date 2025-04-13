@@ -117,7 +117,7 @@ $policies = mysqli_query($conn, $sql);
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <form action="add_policy.php" method="post">
+                <form action="add_policy.php" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Policy Type</label>
@@ -141,6 +141,40 @@ $policies = mysqli_query($conn, $sql);
                             </select>
                         </div>
                     </div>
+
+                    <!-- Document Upload Section -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h6 class="mb-3">Policy Documents</h6>
+                            <div class="document-upload-container border rounded p-3">
+                                <div class="row document-row mb-3">
+                                    <div class="col-md-5">
+                                        <label class="form-label">Document Type</label>
+                                        <select class="form-select" name="document_type[]" required>
+                                            <option value="">Select Document Type</option>
+                                            <option value="policy">Policy Document</option>
+                                            <option value="id_proof">ID Proof</option>
+                                            <option value="address_proof">Address Proof</option>
+                                            <option value="medical">Medical Report</option>
+                                            <option value="other">Other</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="form-label">Upload File</label>
+                                        <input type="file" class="form-control" name="document_file[]" required 
+                                               accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                                        <div class="form-text">Max file size: 5MB. Allowed types: PDF, DOC, DOCX, JPG, PNG</div>
+                                    </div>
+                                    <div class="col-md-2 d-flex align-items-end">
+                                        <button type="button" class="btn btn-success add-document mb-0">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Start Date</label>
@@ -223,5 +257,66 @@ $policies = mysqli_query($conn, $sql);
         </div>
     </div>
 </div>
+
+<!-- Add this script before the closing body tag -->
+<script>
+$(document).ready(function() {
+    // Handle dynamic document upload fields
+    $('.add-document').click(function() {
+        var newRow = $('.document-row:first').clone();
+        newRow.find('input[type="file"]').val('');
+        newRow.find('select').val('');
+        
+        // Add remove button for new rows
+        var removeBtn = $('<button type="button" class="btn btn-danger remove-document mb-0 ms-2"><i class="fas fa-minus"></i></button>');
+        newRow.find('.col-md-2').append(removeBtn);
+        
+        newRow.insertBefore('.document-upload-container .row:last');
+    });
+
+    // Handle remove button click
+    $(document).on('click', '.remove-document', function() {
+        $(this).closest('.document-row').remove();
+    });
+
+    // File size validation
+    $(document).on('change', 'input[type="file"]', function() {
+        var maxSize = 5 * 1024 * 1024; // 5MB
+        if (this.files[0].size > maxSize) {
+            alert('File size exceeds 5MB limit');
+            $(this).val('');
+        }
+    });
+});
+</script>
+
+<style>
+.document-upload-container {
+    background-color: #f8f9fa;
+}
+
+.document-row {
+    padding: 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.document-row:last-child {
+    border-bottom: none;
+}
+
+.add-document, .remove-document {
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.form-text {
+    font-size: 0.75rem;
+    color: #6c757d;
+}
+</style>
 
 <?php include 'includes/footer.php'; ?> 

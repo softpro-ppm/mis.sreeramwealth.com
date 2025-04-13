@@ -141,7 +141,7 @@ include 'includes/header.php';
                                 <p><strong>Term (Years):</strong><br> <?php echo $policy['type_detail']; ?></p>
                                 <p><strong>Beneficiaries:</strong><br> <?php echo nl2br($policy['additional_detail']); ?></p>
                             <?php elseif($policy['type'] == 'general'): ?>
-                                <p><strong>Insurance Type:</strong><br> <?php echo ucfirst($policy['type_detail']); ?></p>
+                                <p><strong>Insurance Type:</strong><br> <?php echo $policy['type_detail']; ?></p>
                                 <p><strong>Property Details:</strong><br> <?php echo nl2br($policy['additional_detail']); ?></p>
                             <?php endif; ?>
                         </div>

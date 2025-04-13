@@ -108,7 +108,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         </div>
                         <div class="list-group-item d-flex justify-content-between align-items-center">
                             <span><i class="fas fa-calendar me-2 text-primary"></i>Member Since</span>
-                            <span class="text-muted"><?php echo date('M d, Y'); ?></span>
+                            <span class="text-muted"><?php echo formatDateDMY(date('Y-m-d')); ?></span>
                         </div>
                     </div>
                 </div>
@@ -134,14 +134,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <div class="timeline-marker bg-primary"></div>
                             <div class="timeline-content">
                                 <h6 class="mb-1">Last Login</h6>
-                                <p class="text-muted mb-0"><?php echo date('M d, Y H:i'); ?></p>
+                                <p class="text-muted mb-0"><?php echo formatDateTimeDMY(date('Y-m-d H:i')); ?></p>
                             </div>
                         </div>
                         <div class="timeline-item">
                             <div class="timeline-marker bg-success"></div>
                             <div class="timeline-content">
                                 <h6 class="mb-1">Profile Updated</h6>
-                                <p class="text-muted mb-0"><?php echo date('M d, Y'); ?></p>
+                                <p class="text-muted mb-0"><?php echo formatDateDMY(date('Y-m-d')); ?></p>
                             </div>
                         </div>
                     </div>
@@ -300,4 +300,4 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 }
 </style>
 
-<?php include 'includes/footer.php'; ?> 
+<?php include 'includes/footer.php'; ?>

@@ -10,6 +10,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 // Include config file
 require_once "config/database.php";
+require_once "includes/utils.php";
 
 // Define variables and initialize with empty values
 $name = $email = $phone = $date_of_birth = $address = "";
@@ -90,7 +91,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty(trim($_POST["date_of_birth"]))){
         $date_of_birth_err = "Please enter date of birth.";
     } else{
-        $date_of_birth = date('Y-m-d', strtotime(trim($_POST["date_of_birth"])));
+        $input_date = trim($_POST["date_of_birth"]);
+        $formatted_date = formatDateForDB($input_date);
+        if($formatted_date === null) {
+            $date_of_birth_err = "Please enter a valid date in DD-MM-YYYY format.";
+        } else {
+            $date_of_birth = $formatted_date;
+        }
     }
     
     // Validate address
@@ -114,7 +121,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             $param_name = $name;
             $param_email = $email;
             $param_phone = $phone;
-            $param_dob = date('Y-m-d', strtotime($date_of_birth));
+            $param_dob = $date_of_birth;
             $param_address = $address;
             $param_id = $client_id;
             
@@ -135,81 +142,85 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     // Close connection
     mysqli_close($conn);
 }
-
-function formatDateDMY($date) {
-    return date('d-m-Y', strtotime($date));
-}
 ?>
 
 <?php include 'includes/header.php'; ?>
 
 <div class="container-fluid">
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <h2>Edit Client</h2>
-        </div>
-        <div class="col-md-6 text-end">
-            <a href="clients.php" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Clients
-            </a>
-        </div>
-    </div>
-
-    <div class="card">
-        <div class="card-body">
-            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"] . "?id=" . $client_id); ?>" method="post">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Name</label>
-                            <input type="text" name="name" class="form-control <?php echo (!empty($name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $name; ?>">
-                            <div class="invalid-feedback"><?php echo $name_err; ?></div>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>">
-                            <div class="invalid-feedback"><?php echo $email_err; ?></div>
-                        </div>
-                    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header">
+                    <h4 class="mb-0">Edit Client</h4>
                 </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Phone</label>
-                            <input type="tel" name="phone" class="form-control <?php echo (!empty($phone_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $phone; ?>">
-                            <div class="invalid-feedback"><?php echo $phone_err; ?></div>
+                <div class="card-body">
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . '?id=' . $client_id; ?>" method="post">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Name</label>
+                                    <input type="text" name="name" class="form-control <?php echo (!empty($name_err)) ? 'is-invalid' : ''; ?>" 
+                                           value="<?php echo htmlspecialchars($name); ?>" required>
+                                    <?php if(!empty($name_err)): ?>
+                                        <div class="invalid-feedback"><?php echo $name_err; ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" 
+                                           value="<?php echo htmlspecialchars($email); ?>" required>
+                                    <?php if(!empty($email_err)): ?>
+                                        <div class="invalid-feedback"><?php echo $email_err; ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label class="form-label">Date of Birth</label>
-                            <input type="text" name="date_of_birth" class="form-control <?php echo (!empty($date_of_birth_err)) ? 'is-invalid' : ''; ?>" 
-                                   value="<?php echo $date_of_birth ? formatDateDMY($date_of_birth) : ''; ?>" 
-                                   placeholder="DD-MM-YYYY" required>
-                            <?php if(!empty($date_of_birth_err)): ?>
-                                <div class="invalid-feedback"><?php echo $date_of_birth_err; ?></div>
-                            <?php endif; ?>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Phone</label>
+                                    <input type="tel" name="phone" class="form-control <?php echo (!empty($phone_err)) ? 'is-invalid' : ''; ?>" 
+                                           value="<?php echo htmlspecialchars($phone); ?>" required>
+                                    <?php if(!empty($phone_err)): ?>
+                                        <div class="invalid-feedback"><?php echo $phone_err; ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Date of Birth</label>
+                                    <input type="text" name="date_of_birth" class="form-control <?php echo (!empty($date_of_birth_err)) ? 'is-invalid' : ''; ?>" 
+                                           value="<?php echo $date_of_birth ? formatDateDMY($date_of_birth) : ''; ?>" 
+                                           placeholder="DD-MM-YYYY" required>
+                                    <?php if(!empty($date_of_birth_err)): ?>
+                                        <div class="invalid-feedback"><?php echo $date_of_birth_err; ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
                         </div>
-                    </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label class="form-label">Address</label>
+                                    <textarea name="address" class="form-control <?php echo (!empty($address_err)) ? 'is-invalid' : ''; ?>" 
+                                              rows="3" required><?php echo htmlspecialchars($address); ?></textarea>
+                                    <?php if(!empty($address_err)): ?>
+                                        <div class="invalid-feedback"><?php echo $address_err; ?></div>
+                                    <?php endif; ?>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">Update Client</button>
+                            <a href="clients.php" class="btn btn-secondary">Cancel</a>
+                        </div>
+                    </form>
                 </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Address</label>
-                    <textarea name="address" class="form-control <?php echo (!empty($address_err)) ? 'is-invalid' : ''; ?>" rows="3"><?php echo $address; ?></textarea>
-                    <div class="invalid-feedback"><?php echo $address_err; ?></div>
-                </div>
-
-                <div class="text-end">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Update Client
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 
-<?php include 'includes/footer.php'; ?> 
+<?php include 'includes/footer.php'; ?>

@@ -183,7 +183,7 @@ function safeHtmlspecialchars($str) {
                                         <td><?php echo date('d M Y H:i', strtotime($doc['created_at'])); ?></td>
                                         <td>
                                             <?php 
-                                            $file_path = $upload_dir . $doc['file_name'];
+                                            $file_path = $upload_dir . $doc['file_path'];
                                             if(file_exists($file_path)): 
                                             ?>
                                             <a href="<?php echo safeHtmlspecialchars($file_path); ?>" 

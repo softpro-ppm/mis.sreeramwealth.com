@@ -39,7 +39,7 @@ try {
         $sql = "SELECT 
             p.policy_number,
             c.name as client_name,
-            p.policy_type,
+            p.type,
             p.premium,
             p.start_date,
             p.end_date,
@@ -255,7 +255,7 @@ try {
                                 <?php if($report_type == 'revenue'): ?>
                                     <td><?php echo htmlspecialchars($row['policy_number']); ?></td>
                                     <td><?php echo htmlspecialchars($row['client_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['policy_type']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['type']); ?></td>
                                     <td>₹<?php echo number_format($row['premium'], 2); ?></td>
                                     <td><?php echo date('d M Y', strtotime($row['start_date'])); ?></td>
                                     <td><?php echo date('d M Y', strtotime($row['end_date'])); ?></td>
@@ -274,7 +274,7 @@ try {
                                 <?php elseif($report_type == 'policies'): ?>
                                     <td><?php echo htmlspecialchars($row['policy_number']); ?></td>
                                     <td><?php echo htmlspecialchars($row['client_name']); ?></td>
-                                    <td><?php echo htmlspecialchars($row['policy_type']); ?></td>
+                                    <td><?php echo htmlspecialchars($row['type']); ?></td>
                                     <td>₹<?php echo number_format($row['premium'], 2); ?></td>
                                     <td><?php echo date('d M Y', strtotime($row['start_date'])); ?></td>
                                     <td><?php echo date('d M Y', strtotime($row['end_date'])); ?></td>

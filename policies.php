@@ -96,9 +96,9 @@ $policies = mysqli_query($conn, $sql);
                             <a href="edit_policy.php?id=<?php echo $policy['id']; ?>" class="btn btn-sm btn-primary" title="Edit">
                                 <i class="fas fa-edit"></i>
                             </a>
-                            <a href="policies.php?delete=<?php echo $policy['id']; ?>" class="btn btn-sm btn-danger delete-btn" title="Delete">
+                            <button type="button" class="btn btn-sm btn-danger delete-policy" data-id="<?php echo $policy['id']; ?>" title="Delete">
                                 <i class="fas fa-trash"></i>
-                            </a>
+                            </button>
                         </td>
                     </tr>
                     <?php endwhile; ?>

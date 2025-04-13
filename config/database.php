@@ -1,8 +1,8 @@
 <?php
 define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
-define('DB_NAME', 'insurance_management');
+define('DB_USERNAME', 'u820431346_swm');
+define('DB_PASSWORD', 'Metx@123');
+define('DB_NAME', 'u820431346_swm');
 
 // Attempt to connect to MySQL database
 $conn = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME);

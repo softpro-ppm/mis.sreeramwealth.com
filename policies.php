@@ -166,8 +166,8 @@ $policies = mysqli_query($conn, $sql);
                                         <div class="form-text">Max file size: 5MB. Allowed types: PDF, DOC, DOCX, JPG, PNG</div>
                                     </div>
                                     <div class="col-md-2 d-flex align-items-end">
-                                        <button type="button" class="btn btn-success add-document mb-0">
-                                            <i class="fas fa-plus"></i>
+                                        <button type="button" class="btn btn-danger remove-document">
+                                            <i class="fas fa-minus"></i>
                                         </button>
                                     </div>
                                 </div>
@@ -258,28 +258,44 @@ $policies = mysqli_query($conn, $sql);
     </div>
 </div>
 
-<!-- Add this script before the closing body tag -->
+<!-- Add this right before the closing </body> tag, after including footer.php -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-$(document).ready(function() {
+document.addEventListener('DOMContentLoaded', function() {
     // Handle dynamic document upload fields
-    $('.add-document').click(function() {
-        var newRow = $('.document-row:first').clone();
-        // Clear previous values
-        newRow.find('input[type="file"]').val('');
-        newRow.find('select').val('');
+    $(document).on('click', '.add-document', function() {
+        var documentRow = `
+            <div class="row document-row mb-3">
+                <div class="col-md-5">
+                    <label class="form-label">Document Type</label>
+                    <select class="form-select" name="document_type[]" required>
+                        <option value="">Select Document Type</option>
+                        <option value="policy">Policy Document</option>
+                        <option value="id_proof">ID Proof</option>
+                        <option value="address_proof">Address Proof</option>
+                        <option value="medical">Medical Report</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label">Upload File</label>
+                    <input type="file" class="form-control" name="document_file[]" required 
+                           accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                    <div class="form-text">Max file size: 5MB. Allowed types: PDF, DOC, DOCX, JPG, PNG</div>
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="button" class="btn btn-danger remove-document">
+                        <i class="fas fa-minus"></i>
+                    </button>
+                </div>
+            </div>
+        `;
         
-        // Replace the add button with remove button in the new row
-        var addButton = newRow.find('.add-document');
-        var removeButton = $('<button type="button" class="btn btn-danger remove-document"><i class="fas fa-minus"></i></button>');
-        addButton.replaceWith(removeButton);
-        
-        // Append the new row to the container
-        $('.document-upload-container').append(newRow);
+        $('.document-upload-container').append(documentRow);
     });
 
     // Handle remove button click
     $(document).on('click', '.remove-document', function() {
-        // Don't remove if it's the last row
         if ($('.document-row').length > 1) {
             $(this).closest('.document-row').remove();
         }
@@ -288,32 +304,34 @@ $(document).ready(function() {
     // File size and type validation
     $(document).on('change', 'input[type="file"]', function() {
         var maxSize = 5 * 1024 * 1024; // 5MB
-        var allowedTypes = ['application/pdf', 'application/msword', 
-                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-                          'image/jpeg', 'image/png'];
+        var allowedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
+        var fileName = this.value.toLowerCase();
+        var validFile = false;
         
-        if (this.files[0]) {
-            // Check file size
-            if (this.files[0].size > maxSize) {
-                alert('File size exceeds 5MB limit');
-                $(this).val('');
-                return;
-            }
-            
-            // Check file type
-            if (!allowedTypes.includes(this.files[0].type)) {
-                alert('Invalid file type. Please upload PDF, DOC, DOCX, JPG, or PNG files only.');
-                $(this).val('');
-                return;
+        // Check file extension
+        for(var i = 0; i < allowedTypes.length; i++) {
+            if(fileName.endsWith(allowedTypes[i])) {
+                validFile = true;
+                break;
             }
         }
-    });
+        
+        if (!validFile) {
+            alert('Invalid file type. Please upload PDF, DOC, DOCX, JPG, or PNG files only.');
+            $(this).val('');
+            return;
+        }
+        
+        // Check file size
+        if (this.files[0] && this.files[0].size > maxSize) {
+            alert('File size exceeds 5MB limit');
+            $(this).val('');
+            return;
+        }
 
-    // Show selected filename
-    $(document).on('change', 'input[type="file"]', function() {
-        var fileName = $(this).val().split('\\').pop();
-        if (fileName) {
-            $(this).next('.form-text').html('Selected file: ' + fileName);
+        // Show selected filename
+        if (this.files[0]) {
+            $(this).next('.form-text').html('Selected file: ' + this.files[0].name);
         } else {
             $(this).next('.form-text').html('Max file size: 5MB. Allowed types: PDF, DOC, DOCX, JPG, PNG');
         }

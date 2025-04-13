@@ -216,7 +216,7 @@ include 'includes/header.php';
         </div>
     <?php endif; ?>
 
-    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . '?id=' . $policy_id; ?>" method="post" enctype="multipart/form-data">
+    <form id="policyForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . '?id=' . $policy_id; ?>" method="post" enctype="multipart/form-data">
         <div class="row">
             <div class="col-md-8">
                 <!-- Policy Details Card -->
@@ -264,7 +264,7 @@ include 'includes/header.php';
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Start Date</label>
-                                <input type="text" class="form-control" name="start_date" 
+                                <input type="text" id="start_date" class="form-control datepicker" name="start_date" 
                                        value="<?php echo formatDateDMY($policy['start_date']); ?>" 
                                        placeholder="DD-MM-YYYY" required>
                             </div>
@@ -273,7 +273,7 @@ include 'includes/header.php';
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label class="form-label">End Date</label>
-                                <input type="text" class="form-control" name="end_date" 
+                                <input type="text" id="end_date" class="form-control datepicker" name="end_date" 
                                        value="<?php echo formatDateDMY($policy['end_date']); ?>" 
                                        placeholder="DD-MM-YYYY" required>
                             </div>
@@ -482,6 +482,73 @@ include 'includes/header.php';
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize form validation
+    $("#policyForm").validate({
+        rules: {
+            policy_number: {
+                required: true,
+                minlength: 5
+            },
+            type: "required",
+            start_date: {
+                required: true,
+                dateFormat: true
+            },
+            end_date: {
+                required: true,
+                dateFormat: true,
+                greaterThan: "#start_date"
+            },
+            premium: {
+                required: true,
+                number: true,
+                min: 0
+            },
+            coverage_amount: {
+                required: true,
+                number: true,
+                min: 0
+            }
+        },
+        messages: {
+            policy_number: {
+                required: "Please enter policy number",
+                minlength: "Policy number must be at least 5 characters"
+            },
+            type: "Please select policy type",
+            start_date: {
+                required: "Please enter start date",
+                dateFormat: "Please enter a valid date in DD-MM-YYYY format"
+            },
+            end_date: {
+                required: "Please enter end date",
+                dateFormat: "Please enter a valid date in DD-MM-YYYY format",
+                greaterThan: "End date must be after start date"
+            },
+            premium: {
+                required: "Please enter premium amount",
+                number: "Please enter a valid number",
+                min: "Premium cannot be negative"
+            },
+            coverage_amount: {
+                required: "Please enter coverage amount",
+                number: "Please enter a valid number",
+                min: "Coverage amount cannot be negative"
+            }
+        },
+        errorElement: 'div',
+        errorPlacement: function(error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.mb-3').append(error);
+        },
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
+        },
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
+        }
+    });
+
     // Handle dynamic document upload fields
     $(document).on('click', '.add-document', function() {
         var documentRow = `

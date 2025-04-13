@@ -218,8 +218,11 @@ include 'includes/header.php';
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label">Type</label>
-                                <input type="text" class="form-control" value="<?php echo ucfirst($policy['type']); ?>" readonly>
-                                <input type="hidden" name="type" value="<?php echo $policy['type']; ?>">
+                                <select class="form-select" name="type" required>
+                                    <option value="health" <?php echo $policy['type'] == 'health' ? 'selected' : ''; ?>>Health Insurance</option>
+                                    <option value="life" <?php echo $policy['type'] == 'life' ? 'selected' : ''; ?>>Life Insurance</option>
+                                    <option value="general" <?php echo $policy['type'] == 'general' ? 'selected' : ''; ?>>General Insurance</option>
+                                </select>
                             </div>
                         </div>
 

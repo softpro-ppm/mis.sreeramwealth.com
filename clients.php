@@ -99,7 +99,7 @@ input.valid, textarea.valid {
                         <td><?php echo $client['name']; ?></td>
                         <td><?php echo $client['email']; ?></td>
                         <td><?php echo $client['phone']; ?></td>
-                        <td><?php echo date('d M Y', strtotime($client['date_of_birth'])); ?></td>
+                        <td><?php echo formatDateDMY($client['date_of_birth']); ?></td>
                         <td><?php echo substr($client['address'], 0, 30) . '...'; ?></td>
                         <td>
                             <a href="view_client.php?id=<?php echo $client['id']; ?>" class="btn btn-sm btn-info" title="View">
@@ -147,7 +147,8 @@ input.valid, textarea.valid {
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Date of Birth</label>
-                        <input type="date" class="form-control datepicker" name="date_of_birth" required>
+                        <input type="date" class="form-control" name="date_of_birth" required max="<?php echo date('Y-m-d'); ?>">
+                        <small class="text-muted">Format: DD-MM-YYYY</small>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Address</label>
@@ -188,7 +189,10 @@ $(document).ready(function() {
             },
             date_of_birth: {
                 required: true,
-                date: true
+                date: true,
+                max: function() {
+                    return new Date().toISOString().split('T')[0];
+                }
             },
             address: {
                 required: true,
@@ -213,41 +217,31 @@ $(document).ready(function() {
             },
             date_of_birth: {
                 required: "Please enter date of birth",
-                date: "Please enter a valid date"
+                date: "Please enter a valid date",
+                max: "Date of birth cannot be in the future"
             },
             address: {
                 required: "Please enter address",
                 minlength: "Address must be at least 10 characters long"
             }
         },
-        errorElement: 'span',
+        errorElement: 'div',
         errorPlacement: function(error, element) {
             error.addClass('invalid-feedback');
             element.closest('.mb-3').append(error);
         },
-        highlight: function(element, errorClass, validClass) {
-            $(element).addClass('is-invalid').removeClass('is-valid');
+        highlight: function(element) {
+            $(element).addClass('is-invalid');
         },
-        unhighlight: function(element, errorClass, validClass) {
-            $(element).removeClass('is-invalid').addClass('is-valid');
-        },
-        submitHandler: function(form) {
-            // Convert name to uppercase before submitting
-            $('input[name="name"]').val($('input[name="name"]').val().toUpperCase());
-            form.submit();
+        unhighlight: function(element) {
+            $(element).removeClass('is-invalid');
         }
     });
 
-    // Auto-uppercase for name input
-    $('input[name="name"]').on('input', function() {
-        $(this).val($(this).val().toUpperCase());
-    });
-
-    // Phone number validation
-    $('input[name="phone"]').on('input', function() {
-        this.value = this.value.replace(/[^0-9]/g, '');
-        if (this.value.length > 10) {
-            this.value = this.value.slice(0, 10);
+    // Delete confirmation
+    $('.delete-btn').on('click', function(e) {
+        if(!confirm('Are you sure you want to delete this client?')) {
+            e.preventDefault();
         }
     });
 });

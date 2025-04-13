@@ -74,53 +74,75 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
 <?php include 'includes/header.php'; ?>
 
-<div class="container-fluid">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="text-center">Profile</h3>
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body text-center">
+                    <div class="mb-4">
+                        <div class="avatar-circle mb-3">
+                            <span class="initials"><?php echo strtoupper(substr($username, 0, 1)); ?></span>
+                        </div>
+                        <h4 class="mb-1"><?php echo htmlspecialchars($username); ?></h4>
+                        <p class="text-muted mb-0">User ID: <?php echo $user_id; ?></p>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#changePasswordModal">
+                            <i class="fas fa-key me-2"></i>Change Password
+                        </button>
+                    </div>
                 </div>
+            </div>
+
+            <div class="card shadow-sm">
                 <div class="card-body">
-                    <div class="mb-4">
-                        <h5>Account Information</h5>
-                        <hr>
-                        <div class="row mb-3">
-                            <div class="col-sm-4 fw-bold">Username:</div>
-                            <div class="col-sm-8"><?php echo htmlspecialchars($username); ?></div>
+                    <h5 class="card-title mb-3">Account Information</h5>
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-user me-2 text-primary"></i>Username</span>
+                            <span class="text-muted"><?php echo htmlspecialchars($username); ?></span>
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-sm-4 fw-bold">User ID:</div>
-                            <div class="col-sm-8"><?php echo $user_id; ?></div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-id-card me-2 text-primary"></i>User ID</span>
+                            <span class="text-muted"><?php echo $user_id; ?></span>
+                        </div>
+                        <div class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-calendar me-2 text-primary"></i>Member Since</span>
+                            <span class="text-muted"><?php echo date('M d, Y'); ?></span>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <div class="mb-4">
-                        <h5>Change Password</h5>
-                        <hr>
-                        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post"> 
-                            <div class="form-group mb-3">
-                                <label>New Password</label>
-                                <input type="password" name="new_password" class="form-control <?php echo (!empty($new_password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $new_password; ?>">
-                                <span class="invalid-feedback"><?php echo $new_password_err; ?></span>
-                            </div>
-                            <div class="form-group mb-3">
-                                <label>Confirm Password</label>
-                                <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>">
-                                <span class="invalid-feedback"><?php echo $confirm_password_err; ?></span>
-                            </div>
-                            <div class="form-group mb-3">
-                                <input type="submit" class="btn btn-primary w-100" value="Change Password">
-                            </div>
-                        </form>
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Security Settings</h5>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        For security reasons, you will be logged out after changing your password.
                     </div>
+                </div>
+            </div>
 
-                    <div class="mb-4">
-                        <h5>Account Security</h5>
-                        <hr>
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle me-2"></i>
-                            For security reasons, you will be logged out after changing your password.
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Recent Activity</h5>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-primary"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Last Login</h6>
+                                <p class="text-muted mb-0"><?php echo date('M d, Y H:i'); ?></p>
+                            </div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="timeline-marker bg-success"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-1">Profile Updated</h6>
+                                <p class="text-muted mb-0"><?php echo date('M d, Y'); ?></p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -128,5 +150,154 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         </div>
     </div>
 </div>
+
+<!-- Change Password Modal -->
+<div class="modal fade" id="changePasswordModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Change Password</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                    <div class="form-group mb-3">
+                        <label class="form-label">New Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input type="password" name="new_password" class="form-control <?php echo (!empty($new_password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $new_password; ?>">
+                        </div>
+                        <div class="invalid-feedback"><?php echo $new_password_err; ?></div>
+                    </div>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <div class="input-group">
+                            <span class="input-group-text">
+                                <i class="fas fa-lock"></i>
+                            </span>
+                            <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>">
+                        </div>
+                        <div class="invalid-feedback"><?php echo $confirm_password_err; ?></div>
+                    </div>
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-save me-2"></i>Update Password
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+}
+
+.initials {
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 1.5rem;
+}
+
+.timeline-item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline-marker {
+    position: absolute;
+    left: -1rem;
+    top: 0;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+}
+
+.timeline-content {
+    padding-left: 1rem;
+}
+
+.card {
+    border: none;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.list-group-item {
+    border: none;
+    padding: 1rem 0;
+}
+
+.list-group-item:not(:last-child) {
+    border-bottom: 1px solid rgba(0,0,0,.05);
+}
+
+.btn-outline-primary {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.btn-outline-primary:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+}
+
+.alert {
+    border-radius: 10px;
+    border: none;
+}
+
+.modal-content {
+    border-radius: 15px;
+    border: none;
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.input-group-text {
+    background: transparent;
+    border-right: none;
+}
+
+.form-control {
+    border-left: none;
+}
+
+.form-control:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+
+.form-control:focus + .input-group-text {
+    border-color: #ced4da;
+}
+</style>
 
 <?php include 'includes/footer.php'; ?> 

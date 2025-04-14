@@ -42,15 +42,19 @@ $sql_recent = "SELECT p.*, c.name as client_name FROM policies p
                ORDER BY p.start_date DESC LIMIT 5";
 $recent_policies = mysqli_query($conn, $sql_recent);
 
-// Get monthly premium data
-$sql_premiums = "SELECT MONTH(start_date) as month, SUM(premium) as total 
-                 FROM policies 
-                 WHERE YEAR(start_date) = YEAR(CURDATE()) 
-                 GROUP BY MONTH(start_date)";
-$result_premiums = mysqli_query($conn, $sql_premiums);
-$monthly_premiums = array_fill(0, 12, 0);
-while($row = mysqli_fetch_assoc($result_premiums)) {
-    $monthly_premiums[$row['month'] - 1] = $row['total'];
+// Get Monthly Premiums Data
+$sql_monthly_premiums = "SELECT 
+    MONTH(start_date) as month,
+    SUM(premium) as total_premium
+    FROM policies 
+    WHERE YEAR(start_date) = YEAR(CURRENT_DATE())
+    GROUP BY MONTH(start_date)
+    ORDER BY month";
+
+$result_monthly = mysqli_query($conn, $sql_monthly_premiums);
+$monthly_data = array_fill(0, 12, 0); // Initialize with zeros
+while($row = mysqli_fetch_assoc($result_monthly)) {
+    $monthly_data[$row['month']-1] = floatval($row['total_premium']);
 }
 ?>
 
@@ -135,12 +139,12 @@ while($row = mysqli_fetch_assoc($result_premiums)) {
 <div class="row">
     <div class="col-xl-8 col-lg-7">
         <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <div class="card-header py-3">
                 <h6 class="m-0 font-weight-bold text-primary">Monthly Premiums</h6>
             </div>
             <div class="card-body">
-                <div class="chart-container">
-                    <div id="premiumChart"></div>
+                <div class="chart-area">
+                    <div id="monthlyPremiumsChart"></div>
                 </div>
             </div>
         </div>
@@ -148,12 +152,12 @@ while($row = mysqli_fetch_assoc($result_premiums)) {
 
     <div class="col-xl-4 col-lg-5">
         <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Policy Types</h6>
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Policy Types Distribution</h6>
             </div>
             <div class="card-body">
-                <div class="chart-container">
-                    <div id="policyTypeChart"></div>
+                <div class="chart-pie">
+                    <div id="policyTypesChart"></div>
                 </div>
             </div>
         </div>
@@ -210,20 +214,19 @@ while($row = mysqli_fetch_assoc($result_premiums)) {
 <?php include 'includes/footer.php'; ?>
 
 <script>
-// Premium Chart
-var premiumOptions = {
+// Monthly Premiums Chart
+var monthlyOptions = {
     series: [{
-        name: 'Premium',
-        data: <?php echo json_encode($monthly_premiums); ?>
+        name: 'Premium Amount',
+        data: <?php echo json_encode($monthly_data); ?>
     }],
     chart: {
-        type: 'area',
         height: 350,
+        type: 'area',
         toolbar: {
             show: false
         }
     },
-    colors: ['#4e73df'],
     dataLabels: {
         enabled: false
     },
@@ -234,20 +237,29 @@ var premiumOptions = {
     xaxis: {
         categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     },
+    colors: ['#4e73df'],
+    fill: {
+        type: 'gradient',
+        gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.7,
+            opacityTo: 0.3
+        }
+    },
     tooltip: {
         y: {
-            formatter: function (val) {
-                return "₹" + val.toLocaleString('en-IN')
+            formatter: function(value) {
+                return '₹' + value.toLocaleString('en-IN');
             }
         }
     }
 };
 
-var premiumChart = new ApexCharts(document.querySelector("#premiumChart"), premiumOptions);
-premiumChart.render();
+var monthlyChart = new ApexCharts(document.querySelector("#monthlyPremiumsChart"), monthlyOptions);
+monthlyChart.render();
 
-// Policy Type Chart
-var policyTypeOptions = {
+// Policy Types Chart
+var policyTypesOptions = {
     series: <?php echo json_encode($policy_counts); ?>,
     chart: {
         type: 'donut',
@@ -264,9 +276,20 @@ var policyTypeOptions = {
                 size: '70%'
             }
         }
-    }
+    },
+    responsive: [{
+        breakpoint: 480,
+        options: {
+            chart: {
+                width: 200
+            },
+            legend: {
+                position: 'bottom'
+            }
+        }
+    }]
 };
 
-var policyTypeChart = new ApexCharts(document.querySelector("#policyTypeChart"), policyTypeOptions);
-policyTypeChart.render();
+var policyTypesChart = new ApexCharts(document.querySelector("#policyTypesChart"), policyTypesOptions);
+policyTypesChart.render();
 </script> 

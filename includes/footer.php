@@ -36,27 +36,6 @@
         }
     });
 
-    // Initialize Bootstrap components
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize dropdowns
-        var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-        dropdownElementList.forEach(function(dropdownToggleEl) {
-            new bootstrap.Dropdown(dropdownToggleEl);
-        });
-        
-        // Initialize tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-        tooltipTriggerList.forEach(function(tooltipTriggerEl) {
-            new bootstrap.Tooltip(tooltipTriggerEl);
-        });
-        
-        // Initialize popovers
-        var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
-        popoverTriggerList.forEach(function(popoverTriggerEl) {
-            new bootstrap.Popover(popoverTriggerEl);
-        });
-    });
-
     // Initialize DataTables
     $(document).ready(function() {
         $('.datatable').DataTable({

@@ -6,16 +6,16 @@
     <title>SREERAMWEALTH</title>
     
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
     
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     
     <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
     <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- jQuery Validation -->
     <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
@@ -27,11 +27,6 @@
     <!-- ApexCharts -->
     <link href="https://cdn.jsdelivr.net/npm/apexcharts@3.41.0/dist/apexcharts.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.41.0/dist/apexcharts.min.js"></script>
-
-    <!-- DataTables -->
-    <link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 
     <!-- Custom styles -->
     <link href="assets/css/style.css" rel="stylesheet">
@@ -60,19 +55,6 @@
 
         // Initialize all date inputs with Flatpickr
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize dropdown menus
-            var dropdownElementList = [].slice.call(document.querySelectorAll('.dropdown-toggle'));
-            dropdownElementList.map(function (dropdownToggleEl) {
-                return new bootstrap.Dropdown(dropdownToggleEl);
-            });
-
-            // Initialize DataTables
-            $('.datatable').DataTable({
-                responsive: true,
-                lengthMenu: [5, 10, 25, 50],
-                pageLength: 10
-            });
-
             // Convert all date inputs to text and initialize Flatpickr
             document.querySelectorAll('input[type="date"], input.datepicker').forEach(function(input) {
                 // Create a text input to replace the date input if it's a date type
@@ -168,28 +150,6 @@
     .navbar-brand img {
         height: 40px;
     }
-    .avatar-circle {
-        width: 40px;
-        height: 40px;
-        background-color: #6c757d;
-        border-radius: 50%;
-        color: white;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 16px;
-    }
-    .badge-notification {
-        position: absolute;
-        top: -5px;
-        right: -5px;
-        border-radius: 50%;
-        background-color: #dc3545;
-        color: white;
-        font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-    }
     /* Flatpickr custom styles */
     .flatpickr-calendar {
         background: #fff;
@@ -205,17 +165,6 @@
     }
     .flatpickr-day:hover {
         background: #e9ecef;
-    }
-    .dropdown-menu {
-        border-radius: 0.5rem;
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-        border: none;
-    }
-    .dropdown-item {
-        padding: 0.5rem 1.5rem;
-    }
-    .dropdown-item:hover {
-        background-color: #f8f9fa;
     }
     </style>
 </head>
@@ -241,47 +190,15 @@
                         <a class="nav-link" href="policies.php"><i class="fas fa-file-contract"></i> Policies</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="analytics.php"><i class="fas fa-chart-line"></i> Analytics</a>
-                    </li>
-                    <li class="nav-item">
                         <a class="nav-link" href="reports.php"><i class="fas fa-chart-bar"></i> Reports</a>
                     </li>
                 </ul>
                 <ul class="navbar-nav ms-auto">
-                    <!-- Pending Approvals Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle position-relative" href="#" id="pendingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <i class="fas fa-bell"></i> Pending Approvals
-                            <span class="badge-notification">7</span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="pendingDropdown">
-                            <li><h6 class="dropdown-header">Pending Approvals</h6></li>
-                            <li><a class="dropdown-item" href="#">New Policy #POL-001</a></li>
-                            <li><a class="dropdown-item" href="#">Client Update Request</a></li>
-                            <li><a class="dropdown-item" href="#">Claim #CLM-003</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-primary" href="#">View All Approvals</a></li>
-                        </ul>
+                    <li class="nav-item">
+                        <a class="nav-link" href="profile.php"><i class="fas fa-user-circle"></i> Profile</a>
                     </li>
-                    
-                    <!-- User Dropdown -->
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <div class="avatar-circle me-2">
-                                <?php 
-                                $username = isset($_SESSION['username']) ? $_SESSION['username'] : 'Admin';
-                                $initial = strtoupper(substr($username, 0, 1));
-                                echo $initial;
-                                ?>
-                            </div>
-                            <span class="d-none d-md-inline"><?php echo htmlspecialchars($username); ?></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="userDropdown">
-                            <li><a class="dropdown-item" href="profile.php"><i class="fas fa-user-circle me-2"></i>Profile</a></li>
-                            <li><a class="dropdown-item" href="account.php"><i class="fas fa-cog me-2"></i>Account Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item text-danger" href="logout.php"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
-                        </ul>
+                    <li class="nav-item">
+                        <a class="nav-link" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
                     </li>
                 </ul>
             </div>

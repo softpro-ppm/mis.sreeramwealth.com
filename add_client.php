@@ -14,16 +14,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 // Include config file
 require_once "config/database.php";
-
-// Helper functions
-function isValidDate($date) {
-    $d = DateTime::createFromFormat('Y-m-d', $date);
-    return $d && $d->format('Y-m-d') === $date;
-}
-
-function formatDateForDB($date) {
-    return date('Y-m-d', strtotime($date));
-}
+require_once "includes/utils.php";
 
 // Define variables and initialize with empty values
 $name = $email = $phone = $date_of_birth = $address = "";

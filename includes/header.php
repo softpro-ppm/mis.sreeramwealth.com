@@ -144,6 +144,11 @@
     body {
         background-color: #f8f9fa;
     }
+    .container-fluid {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
     .navbar {
         box-shadow: 0 2px 4px rgba(0,0,0,.1);
     }

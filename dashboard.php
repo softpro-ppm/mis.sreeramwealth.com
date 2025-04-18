@@ -175,14 +175,14 @@ while($row = mysqli_fetch_assoc($result_monthly)) {
                     <table class="table table-striped datatable" id="recentPoliciesTable">
                         <thead>
                             <tr>
-                                <th>#</th>
-                                <th>Policy Number</th>
-                                <th>Client Name</th>
-                                <th>Type</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Premium</th>
-                                <th>Status</th>
+                                <th># <button class="btn btn-sm btn-link p-0 sort-btn"><i class="fas fa-sort"></i></button></th>
+                                <th>Policy Number <button class="btn btn-sm btn-link p-0 sort-btn"><i class="fas fa-sort"></i></button></th>
+                                <th>Client Name <button class="btn btn-sm btn-link p-0 sort-btn"><i class="fas fa-sort"></i></button></th>
+                                <th>Type <button class="btn btn-sm btn-link p-0 sort-btn"><i class="fas fa-sort"></i></button></th>
+                                <th>Start Date <button class="btn btn-sm btn-link p-0 sort-btn"><i class="fas fa-sort"></i></button></th>
+                                <th>End Date <button class="btn btn-sm btn-link p-0 sort-btn"><i class="fas fa-sort"></i></button></th>
+                                <th>Premium <button class="btn btn-sm btn-link p-0 sort-btn"><i class="fas fa-sort"></i></button></th>
+                                <th>Status <button class="btn btn-sm btn-link p-0 sort-btn"><i class="fas fa-sort"></i></button></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -215,6 +215,31 @@ while($row = mysqli_fetch_assoc($result_monthly)) {
 
 <?php include 'includes/footer.php'; ?>
 
+<style>
+.sort-btn {
+    font-size: 0.8rem;
+    color: #6c757d;
+    transition: color 0.2s;
+}
+
+.sort-btn:hover {
+    color: #0d6efd;
+}
+
+.sorting_asc .sort-btn i,
+.sorting_desc .sort-btn i {
+    color: #0d6efd;
+}
+
+.sorting_asc .sort-btn i:before {
+    content: "\f0de";
+}
+
+.sorting_desc .sort-btn i:before {
+    content: "\f0dd";
+}
+</style>
+
 <script>
 // Initialize DataTable for Recent Policies
 $(document).ready(function() {
@@ -242,18 +267,9 @@ $(document).ready(function() {
         columnDefs: [
             {
                 targets: '_all',
-                orderable: true,
-                className: 'sorting'
+                orderable: true
             }
-        ],
-        initComplete: function() {
-            // Add sorting icons to all sortable columns
-            this.api().columns().every(function() {
-                var column = this;
-                var header = $(column.header());
-                header.append('<span class="sort-icon"></span>');
-            });
-        }
+        ]
     });
 });
 

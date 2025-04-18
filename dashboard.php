@@ -175,6 +175,7 @@ while($row = mysqli_fetch_assoc($result_monthly)) {
                     <table class="table table-striped datatable">
                         <thead>
                             <tr>
+                                <th>#</th>
                                 <th>Policy Number</th>
                                 <th>Client Name</th>
                                 <th>Type</th>
@@ -185,8 +186,9 @@ while($row = mysqli_fetch_assoc($result_monthly)) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php while($policy = mysqli_fetch_assoc($recent_policies)): ?>
+                            <?php $counter = 1; while($policy = mysqli_fetch_assoc($recent_policies)): ?>
                             <tr>
+                                <td><?php echo $counter++; ?></td>
                                 <td><?php echo $policy['policy_number']; ?></td>
                                 <td><?php echo $policy['client_name']; ?></td>
                                 <td><?php echo ucfirst($policy['type']); ?></td>

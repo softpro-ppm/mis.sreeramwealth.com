@@ -1,4 +1,8 @@
 <?php
+// Enable error reporting
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
 // Initialize the session
 session_start();
  
@@ -27,6 +31,8 @@ $name_err = $email_err = $phone_err = $date_of_birth_err = $address_err = "";
 
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
+    // Log POST data
+    error_log("POST Data: " . print_r($_POST, true));
     
     // Validate name
     if(empty(trim($_POST["name"]))){
@@ -52,9 +58,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     $email = trim($_POST["email"]);
                 }
             } else{
+                error_log("Error checking email: " . mysqli_error($conn));
                 echo "Oops! Something went wrong. Please try again later.";
             }
             mysqli_stmt_close($stmt);
+        } else {
+            error_log("Error preparing email check statement: " . mysqli_error($conn));
         }
     }
     
@@ -107,12 +116,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 header("location: clients.php?status=added");
                 exit();
             } else{
+                error_log("Error inserting client: " . mysqli_error($conn));
                 echo "Something went wrong. Please try again later.";
             }
 
             // Close statement
             mysqli_stmt_close($stmt);
+        } else {
+            error_log("Error preparing insert statement: " . mysqli_error($conn));
         }
+    } else {
+        error_log("Validation errors: " . print_r([
+            'name_err' => $name_err,
+            'email_err' => $email_err,
+            'phone_err' => $phone_err,
+            'date_of_birth_err' => $date_of_birth_err,
+            'address_err' => $address_err
+        ], true));
     }
     
     // Close connection
@@ -129,6 +149,19 @@ include 'includes/header.php';
             <i class="fas fa-arrow-left"></i> Back to Clients
         </a>
     </div>
+
+    <?php if(!empty($name_err) || !empty($email_err) || !empty($phone_err) || !empty($date_of_birth_err) || !empty($address_err)): ?>
+    <div class="alert alert-danger">
+        <strong>Please fix the following errors:</strong>
+        <ul>
+            <?php if(!empty($name_err)) echo "<li>$name_err</li>"; ?>
+            <?php if(!empty($email_err)) echo "<li>$email_err</li>"; ?>
+            <?php if(!empty($phone_err)) echo "<li>$phone_err</li>"; ?>
+            <?php if(!empty($date_of_birth_err)) echo "<li>$date_of_birth_err</li>"; ?>
+            <?php if(!empty($address_err)) echo "<li>$address_err</li>"; ?>
+        </ul>
+    </div>
+    <?php endif; ?>
 
     <div class="card">
         <div class="card-body">

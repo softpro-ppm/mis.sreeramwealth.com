@@ -39,7 +39,7 @@ while($row = mysqli_fetch_assoc($result_policy_types)) {
 // Get recent policies
 $sql_recent = "SELECT p.*, c.name as client_name FROM policies p 
                JOIN clients c ON p.client_id = c.id 
-               ORDER BY p.start_date DESC LIMIT 5";
+               ORDER BY p.created_at DESC LIMIT 5";
 $recent_policies = mysqli_query($conn, $sql_recent);
 
 // Get Monthly Premiums Data
@@ -186,9 +186,9 @@ while($row = mysqli_fetch_assoc($result_monthly)) {
                             </tr>
                         </thead>
                         <tbody>
-                            <?php $counter = 1; while($policy = mysqli_fetch_assoc($recent_policies)): ?>
+                            <?php while($policy = mysqli_fetch_assoc($recent_policies)): ?>
                             <tr>
-                                <td><?php echo $counter++; ?></td>
+                                <td></td>
                                 <td><?php echo $policy['policy_number']; ?></td>
                                 <td><?php echo $policy['client_name']; ?></td>
                                 <td><?php echo ucfirst($policy['type']); ?></td>
@@ -249,7 +249,7 @@ $(document).ready(function() {
              '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
         pageLength: 10,
         lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-        order: [[4, 'desc']], // Sort by Start Date by default
+        order: [[0, 'asc']], // Sort by serial number by default
         language: {
             search: "_INPUT_",
             searchPlaceholder: "Search policies...",
@@ -265,6 +265,13 @@ $(document).ready(function() {
             }
         },
         columnDefs: [
+            {
+                targets: 0,
+                orderable: false,
+                render: function(data, type, row, meta) {
+                    return meta.row + 1;
+                }
+            },
             {
                 targets: '_all',
                 orderable: true

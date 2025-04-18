@@ -81,7 +81,7 @@ if($stmt = mysqli_prepare($conn, $sql)) {
                     </div>
                     <div class="row mb-3">
                         <div class="col-sm-4 fw-bold">Date of Birth:</div>
-                        <div class="col-sm-8"><?php echo format_date($client['date_of_birth'], 'd-m-Y'); ?></div>
+                        <div class="col-sm-8"><?php echo date('d M Y', strtotime($client['date_of_birth'])); ?></div>
                     </div>
                     <div class="row">
                         <div class="col-sm-4 fw-bold">Address:</div>

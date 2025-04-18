@@ -239,35 +239,19 @@ $(document).ready(function() {
                 previous: "Previous"
             }
         },
+        columnDefs: [
+            {
+                targets: '_all',
+                orderable: true,
+                className: 'sorting'
+            }
+        ],
         initComplete: function() {
-            // Add custom filter for policy type
-            this.api().columns([3]).every(function() {
+            // Add sorting icons to all sortable columns
+            this.api().columns().every(function() {
                 var column = this;
-                var select = $('<select class="form-select form-select-sm"><option value="">All Types</option></select>')
-                    .appendTo($(column.header()).empty())
-                    .on('change', function() {
-                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                        column.search(val ? '^' + val + '$' : '', true, false).draw();
-                    });
-
-                column.data().unique().sort().each(function(d) {
-                    select.append('<option value="' + d + '">' + d + '</option>');
-                });
-            });
-
-            // Add custom filter for status
-            this.api().columns([7]).every(function() {
-                var column = this;
-                var select = $('<select class="form-select form-select-sm"><option value="">All Status</option></select>')
-                    .appendTo($(column.header()).empty())
-                    .on('change', function() {
-                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
-                        column.search(val ? '^' + val + '$' : '', true, false).draw();
-                    });
-
-                column.data().unique().sort().each(function(d) {
-                    select.append('<option value="' + d + '">' + d + '</option>');
-                });
+                var header = $(column.header());
+                header.append('<span class="sort-icon"></span>');
             });
         }
     });

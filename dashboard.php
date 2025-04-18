@@ -172,7 +172,7 @@ while($row = mysqli_fetch_assoc($result_monthly)) {
             </div>
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-striped datatable">
+                    <table class="table table-striped datatable" id="recentPoliciesTable">
                         <thead>
                             <tr>
                                 <th>#</th>
@@ -216,6 +216,63 @@ while($row = mysqli_fetch_assoc($result_monthly)) {
 <?php include 'includes/footer.php'; ?>
 
 <script>
+// Initialize DataTable for Recent Policies
+$(document).ready(function() {
+    $('#recentPoliciesTable').DataTable({
+        dom: '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+             '<"row"<"col-sm-12"tr>>' +
+             '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        pageLength: 10,
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+        order: [[4, 'desc']], // Sort by Start Date by default
+        language: {
+            search: "_INPUT_",
+            searchPlaceholder: "Search policies...",
+            lengthMenu: "Show _MENU_ entries",
+            info: "Showing _START_ to _END_ of _TOTAL_ entries",
+            infoEmpty: "Showing 0 to 0 of 0 entries",
+            infoFiltered: "(filtered from _MAX_ total entries)",
+            paginate: {
+                first: "First",
+                last: "Last",
+                next: "Next",
+                previous: "Previous"
+            }
+        },
+        initComplete: function() {
+            // Add custom filter for policy type
+            this.api().columns([3]).every(function() {
+                var column = this;
+                var select = $('<select class="form-select form-select-sm"><option value="">All Types</option></select>')
+                    .appendTo($(column.header()).empty())
+                    .on('change', function() {
+                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                        column.search(val ? '^' + val + '$' : '', true, false).draw();
+                    });
+
+                column.data().unique().sort().each(function(d) {
+                    select.append('<option value="' + d + '">' + d + '</option>');
+                });
+            });
+
+            // Add custom filter for status
+            this.api().columns([7]).every(function() {
+                var column = this;
+                var select = $('<select class="form-select form-select-sm"><option value="">All Status</option></select>')
+                    .appendTo($(column.header()).empty())
+                    .on('change', function() {
+                        var val = $.fn.dataTable.util.escapeRegex($(this).val());
+                        column.search(val ? '^' + val + '$' : '', true, false).draw();
+                    });
+
+                column.data().unique().sort().each(function(d) {
+                    select.append('<option value="' + d + '">' + d + '</option>');
+                });
+            });
+        }
+    });
+});
+
 // Monthly Premiums Chart
 var monthlyOptions = {
     series: [{

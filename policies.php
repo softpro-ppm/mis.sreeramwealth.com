@@ -59,26 +59,6 @@ $policies = mysqli_query($conn, $sql);
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div class="dataTables_length">
-                    <label>
-                        Show 
-                        <select name="datatable_length" class="form-select form-select-sm">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                        entries
-                    </label>
-                </div>
-                <div class="dataTables_filter">
-                    <label>
-                        Search:
-                        <input type="search" class="form-control form-control-sm" placeholder="">
-                    </label>
-                </div>
-            </div>
             <table class="table table-striped datatable">
                 <thead>
                     <tr>
@@ -129,30 +109,6 @@ $policies = mysqli_query($conn, $sql);
                     <?php endwhile; ?>
                 </tbody>
             </table>
-            <div class="d-flex justify-content-between align-items-center mt-3">
-                <div class="dataTables_info">
-                    Showing 1 to 10 of 57 entries
-                </div>
-                <div class="dataTables_paginate">
-                    <ul class="pagination">
-                        <li class="paginate_button page-item previous disabled">
-                            <a href="#" class="page-link">Previous</a>
-                        </li>
-                        <li class="paginate_button page-item active">
-                            <a href="#" class="page-link">1</a>
-                        </li>
-                        <li class="paginate_button page-item">
-                            <a href="#" class="page-link">2</a>
-                        </li>
-                        <li class="paginate_button page-item">
-                            <a href="#" class="page-link">3</a>
-                        </li>
-                        <li class="paginate_button page-item next">
-                            <a href="#" class="page-link">Next</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
         </div>
     </div>
 </div>

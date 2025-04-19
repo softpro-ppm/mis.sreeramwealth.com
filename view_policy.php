@@ -14,6 +14,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 // Include config file
 require_once "config/database.php";
+require_once "includes/utils.php";
 
 // Check if policy ID is provided
 if(!isset($_GET['id']) || empty($_GET['id'])) {

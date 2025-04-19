@@ -104,9 +104,6 @@ function safeHtmlspecialchars($str) {
     return !is_null($str) ? htmlspecialchars($str, ENT_QUOTES, 'UTF-8') : '';
 }
 
-function formatDateDMY($date) {
-    return date('d-m-Y', strtotime($date));
-}
 ?>
 
 <div class="container-fluid px-4">

@@ -59,9 +59,30 @@ $policies = mysqli_query($conn, $sql);
 <div class="card">
     <div class="card-body">
         <div class="table-responsive">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="dataTables_length">
+                    <label>
+                        Show 
+                        <select name="datatable_length" class="form-select form-select-sm">
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        entries
+                    </label>
+                </div>
+                <div class="dataTables_filter">
+                    <label>
+                        Search:
+                        <input type="search" class="form-control form-control-sm" placeholder="">
+                    </label>
+                </div>
+            </div>
             <table class="table table-striped datatable">
                 <thead>
                     <tr>
+                        <th>#</th>
                         <th>Policy Number</th>
                         <th>Client Name</th>
                         <th>Type</th>
@@ -73,8 +94,12 @@ $policies = mysqli_query($conn, $sql);
                     </tr>
                 </thead>
                 <tbody>
-                    <?php while($policy = mysqli_fetch_assoc($policies)): ?>
+                    <?php 
+                    $counter = 1;
+                    while($policy = mysqli_fetch_assoc($policies)): 
+                    ?>
                     <tr>
+                        <td><?php echo $counter++; ?></td>
                         <td><?php echo $policy['policy_number']; ?></td>
                         <td><?php echo $policy['client_name']; ?></td>
                         <td><?php echo ucfirst($policy['type']); ?></td>
@@ -104,6 +129,30 @@ $policies = mysqli_query($conn, $sql);
                     <?php endwhile; ?>
                 </tbody>
             </table>
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div class="dataTables_info">
+                    Showing 1 to 10 of 57 entries
+                </div>
+                <div class="dataTables_paginate">
+                    <ul class="pagination">
+                        <li class="paginate_button page-item previous disabled">
+                            <a href="#" class="page-link">Previous</a>
+                        </li>
+                        <li class="paginate_button page-item active">
+                            <a href="#" class="page-link">1</a>
+                        </li>
+                        <li class="paginate_button page-item">
+                            <a href="#" class="page-link">2</a>
+                        </li>
+                        <li class="paginate_button page-item">
+                            <a href="#" class="page-link">3</a>
+                        </li>
+                        <li class="paginate_button page-item next">
+                            <a href="#" class="page-link">Next</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -260,7 +309,31 @@ $policies = mysqli_query($conn, $sql);
     </div>
 </div>
 
-<!-- Add this right before the closing </body> tag, after including footer.php -->
+<!-- Add DataTables CSS and JS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
+<script>
+$(document).ready(function() {
+    $('.datatable').DataTable({
+        "order": [[0, "asc"]], // Sort by serial number by default
+        "pageLength": 10,
+        "lengthMenu": [[10, 25, 50, 100], [10, 25, 50, 100]],
+        "language": {
+            "search": "",
+            "searchPlaceholder": "Search...",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+            "paginate": {
+                "previous": "Previous",
+                "next": "Next"
+            }
+        }
+    });
+});
+</script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>

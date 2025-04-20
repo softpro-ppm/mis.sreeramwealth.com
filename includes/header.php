@@ -155,17 +155,6 @@
     .navbar-brand img {
         height: 40px;
     }
-    /* Dropdown text visibility fix */
-    .form-select {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        padding-right: 2.5rem;
-    }
-    .form-select option {
-        white-space: normal;
-        padding: 0.5rem;
-    }
     /* Flatpickr custom styles */
     .flatpickr-calendar {
         background: #fff;
